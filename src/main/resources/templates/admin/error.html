@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+                xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<script th:inline="javascript">
+	const resultInfo = /*[[${resultInfo}]]*/ [];
+	
+	alert(resultInfo.strRetVal);
+	window.location.href = resultInfo.strRedirectUrl;
+</script>
+<title>에러</title>
+</head>
+<body>
+</body>
+</html>

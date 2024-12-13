@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<link rel="stylesheet" th:href="@{/css/admin/detail.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/helpManage/helpManage.js}"></script>
+<title>문의 글/답변</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="page_title">1 : 1 문의</h2>
+    	<div class="help_contents">
+    		<h3 class="help_title" th:text="${helpDetail.helpTitle}"></h3>
+    		<div class="help_meta">
+    			번호 : <span id="helpNo" th:text="${helpDetail.helpNo}"></span>|
+    			작성자 : <span th:text="${helpDetail.userIdOrEmail}"></span>|
+    			작성일 : <span th:text="${#dates.format(helpDetail.regDate, 'yyyy년 MM월 dd일')}"></span>|
+    			상태 : <span th:text="${helpDetail.stateCode}" th:class="${(helpDetail.stateCode == '답변완료') ? 'status_normal' : 
+						                                                  (helpDetail.stateCode == '답변전') ? 'status_stopped' : ''}"></span>
+    		</div>
+    		<div class="help_admin">
+    			<span th:text="'관리자 : ' + ${helpDetail.adminId}"></span> |
+    			<span th:text="'답변일 : ' + ${#dates.format(helpDetail.answerDate, 'yyyy년 MM월 dd일')}"></span>
+    		</div>
+    		<div class="help_detail">
+    			<span th:utext="${helpDetail.helpDetail}"></span>
+    		</div>
+    		<div class="help_answer">
+    			<textarea id="helpAnswer" th:utext="${helpDetail.answer}" placeholder="답변내용..."></textarea>
+    		</div>
+			<div class="button_group">
+				<button th:onclick="submitAnswer()">답변 제출</button>
+				<button th:onclick="deleteAnswer()">삭제</button>
+				<button th:onclick="location.href='/camping/admin/help_manage'">목록으로</button>
+			</div>
+    	</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+</html>

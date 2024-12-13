@@ -1,0 +1,96 @@
+@charset "UTF-8";
+.help_contents, .review_contents {
+    margin: 20px auto;
+    max-width: 1200px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h3.help_title {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.help_meta, .review_meta {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+.help_meta span {
+    margin-right: 10px;
+}
+
+.help_admin {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+.help_detail {
+    padding: 15px;
+    height: 200px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+    min-height: 100px; /* 최소 높이 설정 */
+}
+.review_detail, .comment_area {
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+    min-height: 100px; /* 최소 높이 설정 */
+}
+.help_answer {
+    margin-bottom: 20px;
+}
+
+.help_answer textarea {
+    width: 98.3%;
+    height: 200px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none; /* 크기 조정 비활성화 */
+    font-size: 16px;
+    color: #333;
+}
+
+.button_group {
+    text-align: right; /* 버튼 중앙 정렬 */
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #555;
+}
+.review_img {
+	width: 800px;
+	height: 500px;
+}
+
+.img_area {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

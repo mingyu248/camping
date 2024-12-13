@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<title>문의 현황</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="user_title">문의 현황</h2>
+        <div id="sub-category">
+		    <ul class="sub-links">
+		        <li><a href="/camping/main">최근 30일간 현황</a></li>
+		        <li><a href="/camping/admin/user_statistics">회원 현황(자체 서비스)</a></li>
+		        <li><a href="/camping/admin/social_statistics">회원 현황(소셜 로그인)</a></li>
+		        <li><a href="/camping/admin/camp_statistics">캠핑장 현황</a></li>
+		        <li><a href="/camping/admin/reservation_statistics">예약 현황</a></li>
+		        <li><a href="/camping/admin/help_statistics">문의 현황</a></li>
+		    </ul>
+		</div>
+		<div class="row">
+			<div class="column">
+				<h3 class="chartTitle">상태 별 현황</h3>
+				<div class="chart-container">
+			    	<canvas id="statusChart"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="column">
+				<h3 class="chartTitle">주간 현황</h3>
+				<div class="chart-container">
+			    	<canvas id="regWeekChart"></canvas>
+				</div>
+			</div>
+			<div class="column">
+				<h3 class="chartTitle">월간 현황</h3>
+				<div class="chart-container">
+				    <canvas id="regMonthChart"></canvas>
+				</div>
+			</div>
+		</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+<script th:inline="javascript">
+	document.addEventListener('DOMContentLoaded', function() {
+		
+		const statusStatistics   = /*[[${statusStatistics}]]*/ [];
+		const regWeekStatistics  = /*[[${regWeekStatistics}]]*/ [];
+		const regMonthStatistics = /*[[${regMonthStatistics}]]*/ [];
+		
+		const statusLabels = statusStatistics.map(item => item.stateCode);
+		const statusData   = statusStatistics.map(item => item.count);
+		
+		const statusChart = new Chart(document.getElementById('statusChart').getContext('2d'), {
+			type: 'pie',
+			data: {
+				labels: statusLabels,
+				datasets: [{
+					label: '회원 수',
+					data: statusData,
+					backgroundColor: [
+						'#2375fa', '#fc3a3a', '#23610f'
+					],
+				}]
+			},
+			options: {
+	            responsive: false,
+	            plugins: {
+	                legend: {
+	                    position: 'top',
+	                },
+	            }
+	        }
+		});
+		
+		const regWeekLabels = regWeekStatistics.map(item => item.regWeek);
+		const regWeekData   = regWeekStatistics.map(item => item.count);
+		
+		const userWeekChart = new Chart(document.getElementById('regWeekChart').getContext('2d'), {
+		    type: 'bar',
+		    data: {
+		        labels: regWeekLabels,
+		        datasets: [{
+		            label: '회원 수',
+		            data: regWeekData,
+		            backgroundColor: '#1976D2',
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        responsive: false,
+		        scales: {
+		            x: {
+		                ticks: {
+		                    autoSkip: false,
+		                    maxRotation: 90,
+		                    minRotation: 0
+		                },
+		                grid: {
+		                    display: true
+		                }
+		            },
+		            y: {
+		            	beginAtZero: true,
+		                min: 0,
+		                max: 50,
+		                ticks: {
+		                    stepSize: 10
+		                }
+		            }
+		        },
+		        plugins: {
+		            legend: {
+		                position: 'top',
+		            },
+		        }
+		    }
+		});
+		
+		const regMonthLabels = regWeekStatistics.map(item => item.regWeek);
+		const regMonthData   = regWeekStatistics.map(item => item.count);
+		
+		const regMonthChart = new Chart(document.getElementById('regMonthChart').getContext('2d'), {
+		    type: 'bar',
+		    data: {
+		        labels: regMonthLabels,
+		        datasets: [{
+		            label: '회원 수',
+		            data: regMonthData,
+		            backgroundColor: '#FF6384',
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        responsive: false,
+		        scales: {
+		            x: {
+		                ticks: {
+		                    autoSkip: false,
+		                    maxRotation: 90,
+		                    minRotation: 0
+		                },
+		                grid: {
+		                    display: true
+		                }
+		            },
+		            y: {
+		            	beginAtZero: true,
+		                min: 0,
+		                max: 50,
+		                ticks: {
+		                    stepSize: 10
+		                }
+		            }
+		        },
+		        plugins: {
+		            legend: {
+		                position: 'top',
+		            },
+		        }
+		    }
+		});
+	});
+</script>
+</html>

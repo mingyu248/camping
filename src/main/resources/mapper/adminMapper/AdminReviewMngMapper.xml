@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminReviewMngMapper">
+
+	<select id="getCampReivewList" resultType="com.team3.camping.domain.ReviewVo" parameterType="map">
+		SELECT CampNo, ReviewNo, ReviewTitle, UserIdOrEmail, Views
+		      ,RegDate, StateCode
+		FROM (
+		      SELECT CampNo
+		            ,a.ReviewNo
+		            ,a.ReviewTitle
+		            ,a.UserIdOrEmail
+		            ,a.Views
+		            ,a.RegDate
+		
+		            ,CASE
+		                 WHEN b.StateCode = 100 THEN '정상'
+		                 WHEN b.StateCode = 900 THEN '정지'
+		                 WHEN b.StateCode = 999 THEN '탈퇴대기'
+		             END AS StateCode
+		            ,ROW_NUMBER() OVER (ORDER BY a.ReviewNo DESC) AS rn
+		      FROM   TReview a INNER JOIN (
+		                                   SELECT ReviewNo, StateCode, UpdDate
+		                                  ,ROW_NUMBER() OVER (
+		                                                      PARTITION BY ReviewNo ORDER BY UpdDate DESC
+		                                                      ) AS rn
+		                                   FROM TReviewHis
+		                                   ) b ON  a.ReviewNo = b.ReviewNo
+		        AND b.rn = 1
+		        AND a.CampNo = #{campNo}
+		        <if test="reviewTitle != null and reviewTitle != ''">
+		        	AND a.ReviewTitle LIKE '%' || #{reviewTitle} || '%'
+		        </if>
+		        <if test="userAccount != null and userAccount != ''">
+		        	AND UserIdOrEmail LIKE '%' || #{userAccount} || '%'
+		        </if>
+		        <if test="startDate != null and startDate != ''">
+		        	AND RegDate > #{startDate}
+		        </if>
+		        <if test="endDate != null and endDate != ''">
+		        	<![CDATA[
+		        	AND RegDate < #{endDate}
+		        	]]>
+		        </if>
+		        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+		        	RegDate BETWEEN #{startDate} AND #{endDate}
+		        </if>
+		        <if test="stateCode != null and stateCode != ''">
+  		        	AND b.StateCode = #{stateCode}
+		        </if>
+		    )
+		WHERE rn BETWEEN #{startRow} AND #{endRow}
+		ORDER BY rn
+	</select>
+	
+	<select id="getCampReivewTotalCount" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM   TReview a INNER JOIN TReviewHis b ON a.ReviewNo = b.ReviewNo
+		WHERE  b.UpdDate = ( 
+		                    SELECT MAX(b2.UpdDate)
+		                    FROM   TReviewHis b2
+		                    WHERE  a.ReviewNo = b2.ReviewNo
+		                    )
+		  AND  a.CampNo = #{campNo}
+		<if test="reviewTitle != null and reviewTitle != ''">
+			AND a.ReviewTitle LIKE '%' || #{reviewTitle} || '%'
+		</if>
+		<if test="userAccount != null and userAccount != ''">
+			AND UserIdOrEmail LIKE '%' || #{userAccount} || '%'
+		</if>
+		<if test="startDate != null and startDate != ''">
+			AND RegDate > #{startDate}
+		</if>
+		<if test="endDate != null and endDate != ''">
+			<![CDATA[
+			AND RegDate < #{endDate}
+			]]>
+		</if>
+		<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+			RegDate BETWEEN #{startDate} AND #{endDate}
+		</if>
+		<if test="stateCode != null and stateCode != ''">
+		  	AND b.StateCode = #{stateCode}
+		</if>
+	</select>
+	
+	<select id="getCampReviewHistory" resultType="com.team3.camping.domain.ReviewVo" parameterType="int">
+		SELECT a.ReviewNo
+		      ,a.UserIdOrEmail
+		      ,b.Reason
+		      ,b.UpdDate
+		      ,b.AdminId
+		      
+		      ,CASE
+		           WHEN b.StateCode = 100 THEN '정상'
+		           WHEN b.StateCode = 900 THEN '정지'
+		       END AS StateCode
+		FROM   TReview a INNER JOIN TReviewHis b ON a.ReviewNo = b.ReviewNo
+		WHERE  a.ReviewNo = #{intReviewNo}
+		ORDER BY UpdDate DESC
+	</select>
+	
+	<select id="getCampReviewDetail" resultType="com.team3.camping.domain.ReviewVo" parameterType="int">
+		SELECT a.CampNo
+		      ,a.ReviewNo
+		      ,a.ReviewTitle
+		      ,a.UserIdOrEmail
+		      ,a.ReviewDetail
+		      
+		      ,a.ReviewImgPath
+		      ,a.Views
+		      ,a.RegDate
+		      ,CASE
+		           WHEN b.StateCode = 100 THEN '정상'
+		           WHEN b.StateCode = 900 THEN '정지'
+		       END AS StateCode
+		FROM   TReview a INNER JOIN TReviewHis b ON a.ReviewNo = b.ReviewNo
+		WHERE  b.UpdDate = (
+                            SELECT MAX(b2.UpdDate)
+                            FROM   TReviewHis b2
+                            WHERE  a.ReviewNo = b2.ReviewNo
+                            )
+          AND  a.ReviewNo = #{intReviewNo}
+	</select>
+	
+	<select id="getCampReviewCommentList" resultType="com.team3.camping.domain.ReviewCommentVo" parameterType="int">
+		SELECT ReviewCommentNo
+		      ,UserIdOrEmail
+		      ,Comments
+		      ,RegDate
+		      ,UpdDate
+		      
+		      ,CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '정지'
+		       END AS StateCode
+		FROM   TReviewComment
+		WHERE  ReviewNo = #{intReviewNo}
+	</select>
+	
+	<select id="getCampReviewCommentCount" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM   TReviewComment
+		WHERE  ReviewNo = #{intReviewNo}
+	</select>
+</mapper>

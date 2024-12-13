@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/user/userStyle.css}">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <title>이메일 수정</title>
+</head>
+<body>
+    
+    <<header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="banner-container">
+        <div>
+            <p class="banner-text">마이페이지</p>
+        </div>
+        <div class="category-div">
+            <ul class="category-ul">
+                <li class="category-li li-active"><a href="/camping/user/my_info" class="text-active">회원 정보</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_cart">찜</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_review">내 후기</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_help">문의</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_reservation">예약 내역</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="wrapper style1">
+        <div class="inner">
+            
+            <div class="update-div">
+                <h3><label for="userName">이름 변경</label></h3>
+                <input type="text" id="userName" class="int" maxlength="100" th:value="${userName}" placeholder="ex) 김필표">
+                <span class="error_next_box">이름을 다시 확인해주세요.</span>
+            </div>
+            
+            <div class="button-div">
+                <button type="button" onclick="userInfoUpdate()">
+                    <span>확인</span>
+                </button>
+            </div>
+            
+        </div>
+    </div>
+    
+
+    <footer id="footer">
+        <div class="inner">
+            <div class="flex flex-3">
+                <div class="col">
+                    <h3>고객센터</h3>
+                    <ul class="alt">
+                        <li><a href="#">공지사항</a></li>
+                        <li><a href="/camping/user/help_regist">문의하기</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright">
+        &copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+        Made with: <a href="https://templated.co/">Templated.co</a>
+    </div>
+    <script th:src="@{/js/common/index/jquery.min.js}"></script>
+    <script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+    <script th:src="@{/js/common/index/skel.min.js}"></script>
+    <script th:src="@{/js/common/index/util.js}"></script>
+    <script th:src="@{/js/common/index/main.js}"></script>
+    
+    <!-- content-->
+    <script th:src="@{/js/common/regist.js}"></script>
+</body>
+</html>

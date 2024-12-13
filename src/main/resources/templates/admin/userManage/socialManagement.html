@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/socialManage/socialManage.js}"></script>
+<title>회원 관리(소셜 로그인 회원)</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="user_title">회원 관리(소셜 로그인 회원)</h2>
+    	<div id="sub-category">
+		    <ul class="sub-links">
+		        <li><a href="/camping/admin/user_manage">자체 서비스 회원</a></li>
+		        <li><a href="/camping/admin/social_manage">소셜 로그인 회원</a></li>
+		    </ul>
+		</div>
+		<div class="search_area">
+		    <input type="text" id="userEmailOrId" placeholder="아이디" class="input-field">
+		    <select id="platform" name="platform" class="select-field">
+		    	<option value="">플랫폼</option>
+		    	<option th:each="platform:${platformList}" th:value="${platform.authVendor}" th:utext="${platform.authVendor}"></option>
+		    </select>
+		    <input type="date" id="startDate" class="input-field">
+		    <input type="date" id="endDate" class="input-field">
+		    <select id="stateCode" class="select-field">
+		        <option value="">상태</option>
+		        <option value="100">정상</option>
+		        <option value="900">비활성화</option>
+		        <option value="999">탈퇴대기</option>
+		    </select>
+		    <button onclick="searchSocialAccount()" class="search-button">검색</button>
+		</div>
+		<div class="limit-selection">
+		    <label for="limitSelect" class="limit-label">페이지당 표시할 회원 수:</label>
+		    <select id="limitSelect" onchange="updateSocialLimit()" class="limit_select-field">
+		        <option value="">회원 수</option>
+		        <option value="10">10</option>
+		        <option value="20">20</option>
+		        <option value="30">30</option>
+		        <option value="40">40</option>
+		        <option value="50">50</option>
+		    </select>
+		</div>
+		<div class="total_and_status_area">
+			<div class="total_count">
+				<div>
+					<span th:text="${pagination.totalCount} + '개의 데이터가 검색됨...'"></span>
+				</div>
+			</div>
+			<div class="status_area">
+				<div th:each="count:${statusCount}" class="status_count">
+				    <span th:text="${count.stateCode}"></span> : 
+				    <span th:text="${count.count}"></span> |
+				</div>
+			</div>
+		</div>
+		<div class="data_list">
+			<table>
+				<thead>
+					<tr>
+						<td>번호</td>
+						<td>이메일</td>
+						<td>이름</td>
+						<td>플랫폼</td>
+						<td>가입일</td>
+						<td>권한</td>
+						<td>상태</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="social:${socialAccountList}">
+						<td><span th:text="${social.userNo}"></span></td>
+						<td><span th:text="${social.userEmail}" class="a_title" th:onclick="'socialDetail(\'' + ${social.userNo} + '\')'"></span></td>
+						<td><span th:text="${social.userName}"></span></td>
+						<td><span th:text="${social.platform}"></span></td>
+						<td><span th:text="${#dates.format(social.regDate, 'yyyy년 MM월 dd일')}"></span></td>
+						<td><span th:text="${social.role}"></span></td>
+						<td><span th:text="${social.stateCode}" th:class="${(social.stateCode == '정상') ? 'status_normal' : 
+						                                                    (social.stateCode == '정지') ? 'status_stopped' :
+						                                                    (social.stateCode == '탈퇴대기') ? 'status_withdrawal' : ''}"></span></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div id="pagination" class="pagination">
+		    <span th:if="${pagination.currentPage > 1}" class="page-item">
+		        <a th:href="@{/admin/social_manage(page=${pagination.currentPage - 1}, limit=${pagination.limit}, id=${userEmailOrId}, platform=${platform}, start_date=${startDate}, end_date=${endDate}, status=${stateCode})}" class="page-link">이전</a>
+		    </span>
+		
+		    <span th:each="page : ${pagination.pageRange}" class="page-item" th:classappend="${page == pagination.currentPage} ? 'active'">
+		        <a th:href="@{/admin/social_manage(page=${page}, limit=${pagination.limit}, id=${userEmailOrId}, platform=${platform}, start_date=${startDate}, end_date=${endDate}, status=${stateCode})}" th:text="${page}" class="page-link"></a>
+		    </span>
+		
+		    <span th:if="${pagination.currentPage < pagination.totalPages}" class="page-item">
+		        <a th:href="@{/admin/social_manage(page=${pagination.currentPage + 1}, limit=${pagination.limit}, id=${userEmailOrId}, platform=${platform}, start_date=${startDate}, end_date=${endDate}, status=${stateCode})}" class="page-link">다음</a>
+		    </span>
+		</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+<style>
+	th:nth-child(1), td:nth-child(1) { width: 50px; }
+	th:nth-child(2), td:nth-child(2) { width: 100px; }
+	th:nth-child(3), td:nth-child(3) { width: 50px; }
+	th:nth-child(4), td:nth-child(4) { width: 50px; }
+	th:nth-child(5), td:nth-child(5) { width: 100px; }
+	th:nth-child(6), td:nth-child(6) { width: 50px; }
+	th:nth-child(7), td:nth-child(7) { width: 50px; }
+</style>
+</html>

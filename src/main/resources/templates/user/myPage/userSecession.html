@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>회원 탈퇴</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script th:src="@{/js/user/userSecession.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/user/popup.css}">
+    
+</head>
+<body>
+	  <h2>탈퇴 사유를 선택해 주세요.</h2>
+	  <br>
+	  
+      <span th:each="reason:${secessionReasonList}">
+         <input type="radio" name="reason" th:value="${reason.secReasonNo}" th:text="${reason.secReason}"><br>
+      </span>
+     
+     <button onclick="userSecession()">탈퇴하기</button>
+     <button onclick="closePage()">돌아가기</button>
+</body>
+</html>

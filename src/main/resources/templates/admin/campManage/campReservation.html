@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/campManage/campManage.js}"></script>
+<title>캠핑장 위치</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="page_title" th:text="${campDetail.FacilityName}"></h2>
+    	<div class="wrapper">
+	        <div class="camp_info_menu">
+	            <ul class="camp_menu">
+	                <li th:onclick="|location.href='@{/admin/camp_detail(no=${campDetail.campNo})}'|">소개</li>
+	                <li th:onclick="|location.href='@{/admin/camp_location(no=${campDetail.campNo})}'|">위치</li>
+	                <li th:onclick="|location.href='@{/admin/camp_review(no=${campDetail.campNo})}'|">후기</li>
+	                <li class="active" th:onclick="|location.href='@{/admin/camp_reservation(no=${campDetail.campNo})}'|">예약 내역</li>
+	            </ul>
+	        </div>
+	    </div>
+	    <div class="contour">
+	    	<div class="separator"></div>
+	    </div>
+    	<div class="reservation_area">
+			<table class="reservation_data">
+				<thead>
+					<tr>
+						<td>번호</td>
+						<td>계정</td>
+						<td>체크인</td>
+						<td>체크아웃</td>
+						<td>예약일</td>
+						<td>상태</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="reservation:${reservationList}">
+						<td><span th:text="${reservation.reservationNo}" class="a_title" th:onclick="'reservationDetail(\'' + ${reservation.reservationNo} + '\')'"></span></td>
+						<td><span th:text="${reservation.userIdOrEmail}" class="a_title" th:onclick="'reservationDetail(\'' + ${reservation.reservationNo} + '\')'"></span></td>
+						<td><span th:text="${#dates.format(reservation.checkInDate, 'yyyy년 MM월 dd일')}"></span></td>
+						<td><span th:text="${#dates.format(reservation.checkOutDate, 'yyyy년 MM월 dd일')}"></span></td>
+						<td><span th:text="${#dates.format(reservation.regDate, 'yyyy년 MM월 dd일')}"></span></td>
+						<td><span th:text="${reservation.stateCode}" th:class="${(reservation.stateCode == '정상') ? 'status_normal' : 
+					                                                             (reservation.stateCode == '보류') ? 'status_stopped' : ''}"></span></td>
+					</tr>
+				</tbody>
+			</table>
+    	</div>
+    	<div id="pagination" class="pagination">
+		    <span th:if="${pagination.currentPage > 1}" class="page-item">
+		        <a th:href="@{/admin/camp_reservation(no=${campNo}, page=${pagination.currentPage - 1}, limit=${pagination.limit})}" class="page-link">이전</a>
+		    </span>
+		
+		    <span th:each="page : ${pagination.pageRange}" class="page-item" th:classappend="${page == pagination.currentPage} ? 'active'">
+		        <a th:href="@{/admin/camp_reservation(no=${campNo}, page=${page}, limit=${pagination.limit})}" th:text="${page}" class="page-link"></a>
+		    </span>
+		
+		    <span th:if="${pagination.currentPage < pagination.totalPages}" class="page-item">
+		        <a th:href="@{/admin/camp_reservation(no=${campNo}, page=${pagination.currentPage + 1}, limit=${pagination.limit})}" class="page-link">다음</a>
+		    </span>
+		</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+</html>

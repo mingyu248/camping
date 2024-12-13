@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/user/userStyle.css}">
+    <script th:src="@{/js/user/camp/camp.js}"></script>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <title>캠핑장 소개</title>
+</head>
+<body>
+    
+    <header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="banner-container">
+        <div>
+            <p class="banner-text" th:text="${camp.facilityName}"></p>
+            <p class="banner-text-small" th:text="${camp.facilityFeatures}"></p>
+        </div>
+        <div class="category-div">
+            <ul class="category-ul">
+                <li class="category-li li-no-active"><a href="/camping/user/camp_list" class="text-active">캠핑장 목록</a></li>
+                <li class="category-li li-active"><a th:href="'/camping/user/camp_detail?camp_no=' + ${campNo}" class="text-active">소개</a></li>
+                <li class="category-li li-no-active"><a th:href="'/camping/user/camp_detail_location?camp_no=' + ${campNo}">위치</a></li>
+                <li class="category-li li-no-active"><a th:href="'/camping/user/camp_detail_review?camp_no=' + ${campNo}">후기</a></li>
+                <li class="category-li li-no-active"><a th:href="'/camping/user/camp_detail_reservation?camp_no=' + ${campNo}">예약</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="wrapper style1">
+        
+        <div class="user-info-div">
+            <h3 th:text="${camp.facilityName + ' 소개'}"></h3>
+        </div>
+        <div class="inner">
+            <div class="camp-detail-div">
+                <hr>
+                    <div class="camp-detail-image-div"  th:if="${!#lists.isEmpty(camp.campImgPathList)}">
+                        <img class="camp-detail-image" th:each="campImgPath :${camp.campImgPathList}" th:src="${'/'+campImgPath}">
+                    </div>
+                    <hr th:if="${!#lists.isEmpty(camp.campImgPathList)}">
+                    
+                    <div class="camp-detail-facility" th:if="${#strings.equals(camp.electricitySubfacility, 'Y') ||
+                                                               #strings.equals(camp.hotWaterSubfacility, 'Y') ||
+                                                               #strings.equals(camp.wirelessInternetSubfacility, 'Y') ||
+                                                               #strings.equals(camp.firewoodSalesSubfacility, 'Y') ||
+                                                               #strings.equals(camp.walkingTrailSubfacility, 'Y') ||
+                                                               #strings.equals(camp.waterPlayAreaSubfacility, 'Y') ||
+                                                               #strings.equals(camp.playgroundSubfacility, 'Y') ||
+                                                               #strings.equals(camp.martSubfacility, 'Y')}">
+                        <div th:if="${#strings.equals(camp.electricitySubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/electricity.png"><p>전기</p></div>
+                        <div th:if="${#strings.equals(camp.hotWaterSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/hot_water.png"><p>온수</p></div>
+                        <div th:if="${#strings.equals(camp.wirelessInternetSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/wifi.png"><p>인터넷</p></div>
+                        <div th:if="${#strings.equals(camp.firewoodSalesSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/fire_wood.png"><p>장작판매</p></div>
+                        <div th:if="${#strings.equals(camp.walkingTrailSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/walking.png"><p>산책로</p></div>
+                        <div th:if="${#strings.equals(camp.waterPlayAreaSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/swimming_pool.png"><p>물놀이장</p></div>
+                        <div th:if="${#strings.equals(camp.playgroundSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/playground.png"><p>놀이터</p></div>
+                        <div th:if="${#strings.equals(camp.martSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/mart.png"><p>마트</p></div>
+                    </div>
+
+                    
+                    <div>
+                        <p th:if="${camp.facilityIntroduction!='알수없음'}" th:text="${camp.facilityIntroduction}"></p>
+                    </div>
+                    
+                    
+                    <hr>
+                    <div class="camp-detail-info-container">
+                        <div class="camp-detail-info-div">
+                            <p class="camp-detail-text1">주소</p><p class="camp-detail-text2" th:text="${camp.roadAddress}"></p>
+                        </div>
+                        <div class="camp-detail-info-div">
+                            <p class="camp-detail-text1">문의처</p><p class="camp-detail-text2" th:text="${camp.telNumber}"></p>
+                        </div>
+                        <div class="camp-detail-info-div">
+                            <p class="camp-detail-text1">캠핑장 유형</p><p class="camp-detail-text2" th:text="${camp.campingType}"></p>
+                        </div>
+                        <div class="camp-detail-info-div" th:if="${#strings.equals(camp.springOperation, 'Y') ||
+                                                                   #strings.equals(camp.summerOperation, 'Y') ||
+                                                                   #strings.equals(camp.autumnOperation, 'Y') ||
+                                                                   #strings.equals(camp.winterOperation, 'Y')}">
+                            <p class="camp-detail-text1">운영기간</p><p class="camp-detail-text2" th:text="${(#strings.equals(camp.springOperation, 'Y') ? '봄 ' : '')
+                                                                                                        + (#strings.equals(camp.summerOperation, 'Y') ? '여름 ' : '')
+                                                                                                        + (#strings.equals(camp.autumnOperation, 'Y') ? '가을 ' : '')
+                                                                                                        + (#strings.equals(camp.winterOperation, 'Y') ? '겨울 ' : '')}"></p>
+                        </div>
+                        <div class="camp-detail-info-div" th:if="${#strings.equals(camp.weekdayOperation, 'Y') ||
+                                                                   #strings.equals(camp.weekendOperation, 'Y')}">
+                            <p class="camp-detail-text1">운영일</p><p class="camp-detail-text2" th:text="${(#strings.equals(camp.weekdayOperation, 'Y') ? '평일 ' : '')
+                                                                                                       + (#strings.equals(camp.weekendOperation, 'Y') ? '주말 ' : '')}"></p>
+                        </div>
+                        <div class="camp-detail-info-div" th:if="${camp.website != '정보없음'}">
+                            <p class="camp-detail-text1">홈페이지</p><a class="camp-detail-text2" th:href="${camp.website}">캠핑장 홈페이지</a>
+                        </div>
+                        <div class="camp-detail-info-div" th:if="${camp.facilityFeatures != '정보없음'}">
+                            <p class="camp-detail-text1">주변이용가능시설</p><p class="camp-detail-text2" th:text="${camp.facilityFeatures}"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="camp-detail-button-div">
+                        <button th:class="${camp.suggestionCheck ? 'button-active' : ''}" th:onclick="suggestionFunction(/*[[${camp.campNo}]], [[${camp.suggestionCheck}]]*/)" th:text="${camp.suggestionCheck ? '추천취소' : '추천하기'}"></button>
+                        <button th:class="${camp.cartCheck ? 'button-active' : ''}" th:onclick="cartFunction(/*[[${camp.campNo}]], [[${camp.cartCheck}]]*/)" th:text="${camp.cartCheck ? '찜취소' : '찜하기'}"></button>
+                    </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <footer id="footer">
+        <div class="inner">
+            <div class="flex flex-3">
+                <div class="col">
+                    <h3>고객센터</h3>
+                    <ul class="alt">
+                        <li><a href="#">공지사항</a></li>
+                        <li><a href="/camping/user/help_regist">문의하기</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright">
+        &copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+        Made with: <a href="https://templated.co/">Templated.co</a>
+    </div>
+    <script th:src="@{/js/common/index/jquery.min.js}"></script>
+    <script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+    <script th:src="@{/js/common/index/skel.min.js}"></script>
+    <script th:src="@{/js/common/index/util.js}"></script>
+    <script th:src="@{/js/common/index/main.js}"></script>
+</body>
+</html>

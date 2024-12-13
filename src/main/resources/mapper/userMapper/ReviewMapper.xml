@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.ReviewMapper">
+
+    <!-- 시퀀스 -->
+    <select id="getSequence" resultType="int">
+        SELECT ReviewNo_SEQ.NEXTVAL
+        FROM   dual
+    </select>
+    
+    <!-- 후기 작성 -->
+    <insert id="reviewRegist" parameterType="com.team3.camping.domain.ReviewVo">
+        INSERT INTO TReview(
+                             ReviewNo
+                            ,UserIdOrEmail 
+                            ,ReviewTitle 
+                            ,ReviewDetail 
+                            ,CampNo 
+                             
+                            ,Views
+                            <if test='reviewImgPath != null'>
+                               ,ReviewImgPath
+                               ,ReviewImgRootPath
+                            </if>
+                            )
+                     VALUES(
+                             #{reviewNo}
+                            ,#{userIdOrEmail}
+                            ,#{reviewTitle}
+                            ,#{reviewDetail}
+                            ,#{campNo}
+                             
+                            ,0 
+                            <if test='reviewImgPath != null'>
+                               ,#{reviewImgPath} 
+                               ,#{reviewImgRootPath}
+                            </if>
+                            )
+    </insert>
+
+    <!-- 후기 His저장 -->
+    <insert id="reviewHisRegist" parameterType="int">
+        INSERT INTO TReviewHis(
+                               ReviewNo    
+                               )
+                        VALUES(
+                              #{reviewNo}
+                               )
+    </insert>    
+    
+    <!-- 전체 후기 리스트 -->
+    <select id="reviewList" parameterType="map" resultType="com.team3.camping.domain.ReviewVo">
+         SELECT ReviewNo, UserIdOrEmail, ReviewTItle, Views, RegDate, rn as reviewRowNo
+               FROM (
+                     SELECT ReviewNo,
+                            ReviewTitle,
+                            UserIdOrEmail,
+                            Views,
+                            RegDate,
+                            ROW_NUMBER() OVER (ORDER BY RegDate DESC) AS rn
+                     FROM   TReview
+                     WHERE  CampNo = #{campNo}
+                     )  
+        WHERE rn BETWEEN #{startRow} AND #{endRow}
+        ORDER BY rn
+    </select>
+    
+    <select id="getReviewTotalCount" parameterType="int" resultType="int">
+        SELECT COUNT(*)
+        FROM   TReview
+        WHERE  CampNo = #{campNo}
+    </select>
+    
+    
+    <!-- 내 후기글 리스트 -->
+    <select id="myReviewList" parameterType="map" resultType="com.team3.camping.domain.ReviewVo">
+        SELECT ReviewNo, UserIdOrEmail, ReviewTitle, Views, RegDate
+              ,rn as reviewRowNo, CampNo
+               FROM (
+                     SELECT ReviewNo
+                           ,ReviewTitle
+                           ,UserIdOrEmail
+                           ,Views
+                           ,RegDate
+                            
+                           ,ROW_NUMBER() OVER (ORDER BY RegDate DESC) AS rn
+                           ,CampNo
+                     FROM   TReview
+                     WHERE  UserIdOrEmail = #{userIdOrEmail}
+                     )  
+        WHERE rn BETWEEN #{startRow} AND #{endRow}
+        ORDER BY rn
+    </select>
+    
+    <select id="getMyReviewTotalCount" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM   TReview
+        WHERE  UserIdOrEmail = #{userIdOrEmail}
+    </select>
+    
+    <!-- 후기 상세내용 -->
+    <select id="reviewDetail" parameterType="int" resultType="com.team3.camping.domain.ReviewVo">
+        SELECT  ReviewNo 
+               ,UserIdOrEmail
+               ,ReviewTitle
+               ,ReviewDetail
+               ,ReviewNo
+               
+               ,Views
+               ,RegDate
+               ,ReviewImgPath
+               ,ReviewImgRootPath
+               ,CampNo
+        FROM    TReview
+        WHERE   ReviewNo  = #{reviewNo}
+    </select>
+    
+    <!-- 후기 삭제 -->
+    <delete id="reviewDelete" parameterType="int">
+        DELETE 
+        FROM   TReview
+        WHERE  ReviewNo = #{reviewNo}
+    </delete>
+    
+    <!-- His삭제 -->
+    <delete id="reviewHisDelete" parameterType="int">
+        DELETE 
+        FROM   TReviewHis
+        WHERE  ReviewNo = #{reviewNo}
+    </delete>
+    
+    <!-- 후기 수정 -->
+    <update id="reviewUpdate" parameterType="com.team3.camping.domain.ReviewVo">
+        UPDATE  TReview
+           SET  ReviewTitle       = #{reviewTitle}
+               ,ReviewDetail      = #{reviewDetail}
+               <if test="imgState == 2">
+                       ,ReviewImgPath      = #{reviewImgPath}
+               </if>
+               <if test="imgState == 3">
+                       ,ReviewImgPath      = null
+               </if>
+               <if test="imgState == 2">
+                       ,ReviewImgRootPath = #{reviewImgRootPath}
+               </if>
+               <if test="imgState == 3">
+                       ,ReviewImgRootPath = null
+               </if>
+        WHERE   ReviewNo           = #{reviewNo}
+    </update>
+    
+    <select id="getReviewImgRootPath" parameterType="int" resultType="String">
+        SELECT ReviewImgRootPath
+        FROM   TReview
+        WHERE  ReviewNo = #{reviewNo} 
+    </select>
+    
+    <!-- 댓글 리스트 -->
+    <select id="reviewCommentList" parameterType="com.team3.camping.domain.ReviewCommentVo" resultType="com.team3.camping.domain.ReviewCommentVo">
+        SELECT   UserIdOrEmail, Comments, RegDate, ReviewCommentNo
+        FROM     TReviewComment
+        WHERE    ReviewNo   = #{reviewNo}
+          AND    StateCode != 666 
+        ORDER BY RegDate DESC
+    </select>
+    
+    <!-- 댓글 작성 -->
+    <insert id="registComment" parameterType="com.team3.camping.domain.ReviewCommentVo">
+        INSERT INTO TReviewComment(
+                                    ReviewCommentNo, ReviewNo, UserIdOrEmail, Comments
+                                    )
+                               VALUES( 
+                                     ReviewCommentNo_SEQ.NEXTVAL, #{reviewNo}, #{userIdOrEmail}, #{comments}
+                                     )
+    </insert>
+    
+    <!-- 댓글 수정 -->
+    <update id="updateComment" parameterType="com.team3.camping.domain.ReviewCommentVo">
+        UPDATE TReviewComment
+           SET Comments        = #{comments}
+        WHERE  UserIdOrEmail   = #{userIdOrEmail}
+          AND  ReviewCommentNo = #{reviewCommentNo} 
+    </update>
+    
+    <!-- 댓글 삭제 -->
+    <delete id="deleteComment" parameterType="long">
+        DELETE TReviewComment
+        WHERE  ReviewCommentNo = #{reviewCommentNo}
+    </delete>
+    
+    <!-- 조회수 증가 -->
+    <update id="increaseView" parameterType="int">
+        UPDATE TReview
+        SET    Views          = Views + 1
+        WHERE  ReviewNo       = #{reviewNo}
+    </update>
+    
+    <!-- 후기 작성자 가져오기 -->
+    <select id="getReviewWriter" parameterType="int" resultType="String">
+        SELECT UserIdOrEmail
+        FROM   TReview
+        WHERE  ReviewNo = #{intReviewNo}
+    </select>
+    
+</mapper>

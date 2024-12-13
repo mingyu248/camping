@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/common/common.css}">
+    <script th:src="@{/js/user/main.js}"></script>
+
+    <title>메인페이지</title>
+</head>
+<body>
+    
+    <header>
+        <nav>
+            <div class="header-left">
+                <ul class="header-nav">
+                    <li><a href="/camping/main" class="active">홈</a></li>
+                </ul>
+            </div>
+            <div class="admin-info">
+                <a th:text="${userId == null ? 'LOGIN' : userId}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}">
+                </a> | 
+                <a th:text="${userId == null ? 'REGIST' : 'LOGOUT'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+    
+        <span th:if="${userId != null}" th:text="${userId} + '님 로그인 하셨습니다'"></span>
+        <span th:if="${userId == null}" >로그아웃 상태</span>
+<!--        <a href="/camping/account">로그인</a>
+        <a th:href="@{'/logout'}" class="btn btn-info active ml-2">Logout</a> -->
+        
+        <div>
+            <button onclick="search()">검색</button>
+        </div>
+        
+        <div class="camp-list">
+            <ul>
+                <li th:onclick="window.location.href='/camping/user/camp_detail?camp_no=' + 1">캠핑장1</li>
+                <li th:onclick="window.location.href='/camping/user/camp_detail?camp_no=' + 2">캠핑장2</li>
+                <li th:onclick="window.location.href='/camping/user/camp_detail?camp_no=' + 3">캠핑장3</li>
+                <li th:onclick="window.location.href='/camping/user/camp_detail?camp_no=' + 4">캠핑장4</li>
+            </ul>
+        </div>
+        
+    </div>
+    
+    
+    
+    <footer>
+        <div class="footer-container">
+            <p>&copy; 2024 Team3. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#">개인정보 처리방침</a>
+                <a href="#">이용약관</a>
+                <a href="/diet/user/help_form">문의하기</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

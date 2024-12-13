@@ -1,0 +1,824 @@
+@charset "UTF-8";
+/* Reset 기본 스타일 */
+body, h1, h2, h3, ul, li, a, table {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    list-style: none;
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+    box-sizing: border-box;
+}
+
+/* 전체 페이지 스타일 */
+body {
+    background-color: #f9f9f9; /* 밝은 배경 */
+    color: #333; /* 기본 텍스트 색상 */
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 헤더 스타일 */
+#header {
+    background-color: #343a40; /* 어두운 배경 */
+    color: #fff; /* 텍스트 색상 */
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+#header h1 a {
+    color: #fff;
+    font-size: 24px;
+    text-transform: uppercase;
+}
+
+#header ul {
+    display: flex;
+    gap: 15px;
+}
+
+#header ul li a {
+    color: #ddd;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+#header ul li a:hover {
+    background-color: #495057;
+}
+
+/* 컨테이너 */
+#container {
+    padding: 20px;
+    margin: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 제목 스타일 */
+#container .page_title {
+    margin-bottom: 20px;
+    font-size: 20px;
+    border-bottom: 2px solid #343a40;
+    padding-bottom: 5px;
+    color: #343a40;
+    text-align: center;
+}
+
+.user_title, .review_title, .reservation_title {
+	text-align: center;
+}
+
+/* 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+thead {
+    background-color: #343A40;
+    color: #ffffff;
+    text-transform: uppercase;
+}
+
+thead td {
+    padding: 10px;
+    font-weight: bold;
+    border: 1px solid #dee2e6;
+    text-align: center;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #f8f9fa;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #ffffff;
+}
+
+tbody td {
+    padding: 10px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    color: #495057;
+}
+
+tbody tr:hover {
+    background-color: #e9ecef;
+}
+
+/* 푸터 스타일 */
+/* Reset 기본 스타일 */
+body, h1, h2, h3, ul, li, a, table {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    list-style: none;
+    text-decoration: none;
+    font-family: 'Arial', sans-serif;
+    box-sizing: border-box;
+}
+
+/* 전체 페이지 스타일 */
+html, body {
+    height: 100%; /* 전체 높이를 차지하도록 설정 */
+}
+
+body {
+    display: flex;
+    flex-direction: column; /* 세로 방향으로 정렬 */
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 헤더 스타일 */
+#header {
+    background-color: #343a40;
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* 컨테이너 */
+#container {
+    flex: 1; /* 콘텐츠 영역이 남은 공간을 차지하도록 설정 */
+    padding: 20px;
+    margin: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 푸터 스타일 */
+#footer {
+    background-color: #343a40;
+    color: #fff;
+    text-align: center;
+    padding: 10px 0;
+    border-top: 1px solid #ddd;
+    width: 100%; /* 화면 전체 너비 */
+}
+
+#footer a {
+    color: #ddd;
+    transition: color 0.3s;
+}
+
+#footer a:hover {
+    color: #fff;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 768px) {
+    #header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    #header ul {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+/* ============================================== */
+/* ====================== 상태 =================== */
+/* ============================================== */
+.status_normal {
+    color: blue;
+    font-weight: bold;
+}
+
+.status_stopped {
+    color: red;
+    font-weight: bold;
+}
+
+.status_withdrawal {
+    color: green;
+    font-weight: bold;
+}
+
+.status_private {
+    color: #f542cb;
+    font-weight: bold;
+}
+
+.status_delete {
+    color: green;
+    font-weight: bold;
+}
+/* ============================================== */
+/* ===================== 페이징 =================== */
+/* ============================================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+}
+.page-item {
+    margin: 0 2px;
+}
+.page-link {
+    padding: 10px 15px;
+    border: 1px solid #333;
+    border-radius: 3px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+}
+.page-link:hover {
+    background-color: #333;
+    color: white;
+}
+.page-item.active .page-link {
+    background-color: #333;
+    color: white;
+    border: 1px solid #333;
+}
+/* ============================================== */
+.search_area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.input-field, .select-field {
+    flex: 1; /* 각 요소가 동일하게 공간을 차지하도록 설정 */
+    min-width: 100px; /* 최소 너비 설정 */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: white;
+    transition: border-color 0.3s;
+}
+
+.search-button {
+    padding: 10px 15px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 150px; /* 버튼의 고정 너비 설정 */
+}
+
+.search-button:hover {
+    background-color: #555;
+}
+
+.limit-selection {
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.limit-label {
+    margin-right: 10px;
+    color: #333; /* 라벨 색상 */
+}
+/* ================================================== */
+.status_count {
+	display: inline;
+}
+
+.status_area, .admin_regist  {
+	margin-top: 10px;
+	text-align: right;
+}
+
+.admin-button {
+    display: inline-block; /* 버튼처럼 보이도록 설정 */
+    padding: 10px 15px; /* 내부 여백 */
+    background-color: #333; /* 기본 배경색 */
+    color: white; /* 텍스트 색상 */
+    text-decoration: none; /* 링크의 기본 밑줄 제거 */
+    border-radius: 5px; /* 모서리 둥글게 */
+    transition: background-color 0.3s; /* 배경색 전환 효과 */
+    width : 120px;
+    text-align: center;
+}
+
+.admin-button:hover {
+    background-color: #555; /* 호버 시 밝은 톤으로 변경 */
+}
+
+.data_list {
+	margin-top: 10px;
+}
+
+/* ================================================== */
+/* ======================= 모달 ====================== */
+/* ================================================== */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0, 0, 0, 0.7); /* 어두운 배경 */
+    padding-top: 60px; 
+}
+
+.modal-content {
+    background-color: #ffffff; 
+    margin: 5% auto; 
+    padding: 20px;
+    border-radius: 12px; 
+    width: 80%; 
+    max-width: 500px; 
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); 
+    animation: fadeIn 0.3s; 
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.close {
+    color: #ff5c5c; 
+    float: right; 
+    font-size: 28px; 
+    font-weight: bold;
+}
+
+.close:hover {
+    color: #d9534f; 
+    cursor: pointer; 
+}
+
+.info-container {
+    margin-top: 20px; 
+}
+
+.info-row {
+    display: flex;                    /* Flexbox 사용 */
+    justify-content: space-between;   /* 좌우 정렬 */
+    align-items: center;              /* 세로 정렬 */
+    margin-bottom: 15px; 
+    border-bottom: 1px solid #e0e0e0; /* 각 행의 아래쪽에 선 추가 */
+    padding: 10px 0;                  /* 패딩 추가 */
+}
+
+.info-label {
+    font-weight: bold; 
+    color: #333; 
+    width: 40%; /* 라벨 폭 설정 */
+}
+
+.info-value {
+    margin-left: 10px; 
+    color: #555; 
+    width: 60%;        /* 값 폭 설정 */
+    text-align: right; /* 데이터 우측 정렬 */
+}
+
+.button-group {
+    text-align: right; /* 버튼을 오른쪽 정렬 */
+    margin-top: 20px;  /* 버튼과 정보 간격 */
+}
+
+.button-group button {
+    background-color: black;         /* 버튼 배경색 */
+    color: white;                    /* 버튼 글자색 */
+    border: none;                      /* 테두리 없애기 */
+    border-radius: 5px;                /* 둥근 모서리 */
+    padding: 10px 15px;                /* 패딩 설정 */
+    cursor: pointer;                   /* 커서 변경 */
+    transition: background-color 0.3s; /* 배경색 변환 효과 */
+}
+
+.button-group button:hover {
+    background-color: #0056b3; /* 마우스 오버 시 색상 변경 */
+}
+
+/* ================================================================== */
+/* ============================ 정지 모달 ============================== */
+/* ================================================================== */
+
+.input-container {
+    margin-top: 20px; /* 입력 영역과 제목 간격 */
+}
+
+.textarea_suspension {
+    width: 95%;             /* 텍스트 영역 너비 */
+    padding: 10px;          /* 패딩 추가 */
+    border: 1px solid #ccc; /* 테두리 색상 */
+    border-radius: 5px;     /* 모서리 둥글게 */
+    resize: none;           /* 크기 조절 비활성화 */
+}
+/* =================================================================== */
+/* ============================ 상세 카테고리 ============================ */
+/* =================================================================== */
+#sub-category {
+    margin: 20px 0;
+    padding: 10px 0;
+    border-bottom: 2px solid #333; /* 하단 테두리로 구분 */
+    text-align: center; /* 전체 중앙 정렬 */
+
+}
+
+/* 리스트 스타일 */
+.sub-links {
+    list-style: none; /* 기본 리스트 스타일 제거 */
+    margin: 0;
+    padding: 0;
+    display: flex; /* 가로 배치 */
+    justify-content: center; /* 가운데 정렬 */
+    gap: 20px; /* 각 탭 간 간격 */
+}
+
+/* 리스트 항목 스타일 */
+.sub-links li {
+    display: inline-block;
+}
+
+/* 링크 스타일 */
+.sub-links a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: #333; /* 기본 텍스트 색상 */
+    font-size: 1em;
+    font-weight: 600;
+    padding: 10px 15px; /* 패딩 추가로 여유 공간 */
+    border-bottom: 2px solid transparent; /* 기본 상태에서 투명한 테두리 */
+    transition: all 0.3s ease; /* 부드러운 효과 */
+}
+
+/* 링크 호버 및 활성화 효과 */
+.sub-links a:hover,
+.sub-links a.active {
+    color: #333; /* 강조 텍스트 색상 */
+    border-bottom: 2px solid #333; /* 하단 강조선 */
+}
+/* =================================================================== */
+/* ====================== 관리자, 회원, 캠핑장 예약 상세정보 ================== */
+/* =================================================================== */
+.user_detail_area, .reservation_detail_area {
+        max-width: 800px; /* 최대 폭 설정 */
+        margin: 0 auto; /* 중앙 정렬 */
+        padding: 20px; /* 내부 여백 */
+    }
+.user_detail_info, .reservation_detail_info {
+    background-color: #f9f9f9; /* 배경색 */
+    border: 1px solid #ddd; /* 테두리 */
+    border-radius: 3px; /* 모서리 둥글게 */
+    padding: 20px; /* 내부 여백 */
+    margin-top: 20px; /* 상단 여백 */
+}
+
+.user_detail_item, .reservation_detail_item {
+    display: flex; /* 플렉스 박스 사용 */
+    justify-content: space-between; /* 양쪽 정렬 */
+    padding: 10px 0; /* 항목 간 여백 */
+    border-bottom: 1px solid #d6d6d6; /* 항목 구분선 */
+}
+
+.user_detail_item:last-child, .reservation_detail_item:last-child {
+    border-bottom: none; /* 마지막 항목 구분선 제거 */
+}
+
+.user_detail_label, .reservation_detail_label {
+    font-weight: bold; /* 레이블 글씨 두껍게 */
+    color: #333; /* 레이블 색상 */
+}
+.btn_group {
+        margin-top: 20px; /* 버튼 그룹 상단 여백 */
+        text-align: right;
+    }
+
+.btn_group button {
+    background-color: #333; /* 기본 버튼 색상 */
+    color: white; /* 텍스트 색상 */
+    border: none; /* 테두리 제거 */
+    padding: 10px 15px; /* 내부 여백 */
+    cursor: pointer; /* 커서 모양 변경 */
+    transition: background-color 0.3s ease; /* 배경색 변화 효과 */
+    border-radius: 5px; /* 버튼 모서리를 둥글게 */
+    font-size: 14px; /* 버튼 텍스트 크기 */
+    margin-right: 10px; /* 버튼 간 여백 */
+}
+
+.btn_group button:hover {
+    background-color: #555; /* hover 시 색상 변경 */
+}
+/* ========================================================== */
+/* .a_title {
+	cursor: pointer;
+	text-decoration-line: underline;
+	text-decoration-thickness: 1.5px;
+} */
+.a_title {
+    cursor: pointer;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1.5px;
+    transition: color 0.3s, text-decoration-thickness 0.3s;
+}
+
+.a_title:hover {
+    color: #333;
+    text-decoration-thickness: 2px;
+}
+/* ======================================================================== */
+/* ==================================== 차트 ================================ */
+.row {
+	padding-top: 80px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.column {
+    flex: 1;
+    margin: 0 10px; /* 열 사이의 간격을 조정 */
+}
+
+.chart-container {
+	display: flex;
+   	justify-content: center; /* 수평 중앙 정렬 */
+   	align-items: center;     /* 수직 중앙 정렬 */
+    margin-top: 0;
+}
+#userChart, #socialChart, #provinceChart, #cityGunGuChart, #regWeekChart,
+#regMonthChart, #provinceReservationChart, #cityGunGuReservationChart, #regWeekReservationChart, #regMonthReservationChart,
+#reservationChart {
+    width: 100%;
+    max-width: 750px;
+    height: 200px;
+    text-align: center;
+}
+#genderChart, #ageGroupChart, #statusChart, #platformChart {
+	width: 100%;
+    max-width: 400px;
+    height: 100px;
+    text-align: center;
+}
+
+.chartTitle {
+	text-align: center;
+}
+/* ======================================================================== */
+.total_and_status_area {
+	display: flex;
+    justify-content: space-between; /* 좌우 정렬 */
+    align-items: center; /* 수직 정렬 */
+}
+.total_count {
+	font-weight: bold;
+	font-size: 17px;
+}
+/* ============================================== */
+/* ================== 캠핑장 상세정보 =============== */
+/* ============================================== */
+.wrapper, .contour, .review_area, .reservation_area {
+    display: flex;
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center;     /* 수직 중앙 정렬 */
+}
+.camp_map_area {
+	display: flex;
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center;     /* 수직 중앙 정렬 */
+}
+.camp_map {
+	width: 90%;
+	max-width: 1200px;
+	height: 600px;
+}
+.review_data, .reservation_data {
+	width: 90%;
+	max-width: 1200px;	
+}
+.review_search {
+	display: flex;
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center;     /* 수직 중앙 정렬 */
+}
+.review_search_area {
+	width: 90%;
+	max-width: 1200px;	
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+ .camp_info_menu {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;        /* 전체 길이를 더 넓게 설정 */
+    max-width: 1200px; /* 최대 길이 제한 */
+    background-color: black;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.camp_menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.camp_menu li {
+    flex: 1; /* 모든 탭이 동일한 너비를 가짐 */
+    text-align: center;
+    padding: 10px; /* 높이를 줄이기 위해 패딩 조정 */
+    cursor: pointer;
+    background-color: black;
+    color: white;
+    border: 1px solid #333; /* 테두리 색상 지정 */
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.camp_menu li.active {
+    background-color: white;
+    color: black;
+}
+
+.camp_menu li:not(.active):hover {
+    background-color: #444;
+}
+
+.separator {
+	width: 90%;        /* 전체 길이를 더 넓게 설정 */
+    max-width: 1200px;
+    height: 2px;
+    background-color: #ddd;
+    margin: 10px 0;
+}
+
+/* ===================================================== */
+/* ========================= 댓글 ======================= */
+/* ===================================================== */
+.comment_list {
+    margin: 20px auto;
+    max-width: 1200px;
+    font-family: 'Arial', sans-serif;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 댓글 아이템 스타일 */
+.comment-item {
+    border-bottom: 1px solid #e0e0e0;
+    padding: 15px 0;
+}
+
+.comment-item:last-child {
+    border-bottom: none;
+}
+
+/* 헤더 스타일 */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+/* 댓글 번호 */
+.comment_no {
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+/* 작성자, 작성일 등 한 줄에 배치 */
+.comment-info {
+    display: flex;
+    gap: 15px; /* 항목 간 간격 */
+    font-size: 14px;
+    color: #555;
+    text-align: right;
+}
+
+.comment-info span {
+    white-space: nowrap; /* 줄바꿈 방지 */
+}
+
+/* 댓글 내용 */
+.my-comment {
+    margin-top: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #444;
+    line-height: 1.5;
+}
+
+/* 버튼 스타일 */
+.comment-actions {
+	text-align: right;
+    margin-top: 10px;
+}
+
+.comment-actions .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background 0.3s;
+}
+.comment-actions .btn:hover {
+    opacity: 0.8;
+}
+/* ================================================== */
+.camp-facility {
+	margin: 20px 0 0 0;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+.icon-info {
+	width: 100px;
+	text-align: center;
+}
+
+.icon-info p {
+    margin: 0 0;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.icon-info img {
+	width: 40px;
+	filter: opacity(0.5) drop-shadow(0 0 0 rgb(0, 0, 0));
+}
+.camp_intro_area {
+    display: flex;
+    justify-content: center; /* 수평 중앙 정렬 */
+    align-items: center;   
+}
+.camp_intro {
+	width: 1200px;
+}
+.image-container {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    align-items: center;
+}
+
+.img_area {
+    margin-right: 20px;
+}
+
+.camp_img {
+    max-width: 100%;
+    height: auto;
+}
+.camp_base_info_area {
+	display: flex;
+	justify-content: center; /* 수평 중앙 정렬 */
+ 	align-items: center;   
+}
+.camp_base_info div {
+	width: 1200px;
+    border-bottom: 1px solid #eee; /* 각 항목 구분선 */
+    padding: 8px 0; /* 항목 간 간격 */
+}
+.camp_base_info div:last-child {
+    border-bottom: none; /* 마지막 항목의 구분선 제거 */
+}
+.camp_base_info label {
+    font-weight: bold; /* label 강조 */
+    display: inline-block; /* label을 블록처럼 표시 */
+    width: 150px; /* label 고정 너비 */
+}
+.btn_area {
+	display: flex;
+	justify-content: center; /* 수평 중앙 정렬 */
+ 	align-items: center;   
+}

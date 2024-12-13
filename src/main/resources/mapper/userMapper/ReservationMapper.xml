@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.ReservationMapper">
+    
+    <!-- 시퀀스 -->
+    <select id="getSequence" resultType="int">
+        SELECT ReservationNo_SEQ.NEXTVAL
+        FROM   dual
+    </select>
+    
+    <!-- 예약된 방 번호 리스트 -->
+    <select id="getReservationAvailableRoomList" parameterType="map" resultType="com.team3.camping.domain.ReservationVo">
+    WITH RoomList AS (
+            SELECT DISTINCT CampRoomNo
+            FROM   TCampReservation
+            WHERE  CampNo = #{campNo}
+        )
+        SELECT rl.CampRoomNo, COUNT(tr.ReservationNo) AS ReservationCount
+        FROM RoomList rl
+        LEFT JOIN TCampReservation tr ON rl.CampRoomNo = tr.CampRoomNo
+          AND tr.CampNo = #{campNo}
+          <![CDATA[
+          AND (TO_DATE(#{checkInDate}  || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') < tr.CheckOutDate
+          AND  TO_DATE(#{checkOutDate} || ' 00:00:00', 'YYYY-MM-DD HH24:MI:SS') > tr.CheckInDate)
+          ]]>
+        GROUP BY rl.CampRoomNo
+        ORDER BY rl.CampRoomNo
+    </select>
+    
+    <!-- 내 예약 리스트 -->
+    <select id="getMyReservationList" parameterType="map" resultType="com.team3.camping.domain.ReservationVo">
+        SELECT a.ReservationNo
+              ,a.CampNo
+              ,a.CampRoomNo
+              ,a.UserIdOrEmail
+              ,a.CheckInDate
+        
+              ,a.CheckOutDate
+              ,a.RegDate
+              ,a.PeopleCount
+              ,CASE
+                   WHEN b.StateCode != 100 THEN '캠핑장 사용 불가'
+                   WHEN a.StateCode = '100' THEN '예약완료'
+                   WHEN a.StateCode = '900' THEN '보류'
+               END AS StateCode
+              ,a.ReservationRowNo
+              ,b.FacilityName
+        FROM  (
+               SELECT ReservationNo
+                     ,CampNo
+                     ,CampRoomNo
+                     ,UserIdOrEmail
+                     ,CheckInDate
+               
+                     ,CheckOutDate
+                     ,RegDate
+                     ,PeopleCount
+                     ,StateCode
+                     ,ReservationRowNo
+                      FROM (
+                            SELECT ReservationNo
+                                  ,CampNo
+                                  ,CampRoomNo
+                                  ,UserIdOrEmail
+                                  ,CheckInDate
+                                  
+                                  ,CheckOutDate
+                                  ,RegDate
+                                  ,PeopleCount
+                                  ,StateCode
+                                  ,ROW_NUMBER() OVER (ORDER BY RegDate DESC) AS ReservationRowNo
+                            FROM   TCampReservation
+                            WHERE  UserIdOrEmail = #{userIdOrEmail}
+                            )
+               ) a
+        INNER JOIN TCampInfo b
+              ON b.CampNo = a.CampNo
+             AND a.ReservationRowNo BETWEEN #{startRow} AND #{endRow}
+        ORDER BY a.ReservationRowNo
+    </select>
+    
+    <!-- 검색된 예약 총 갯수 -->
+    <select id="getMyTotalReservation" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   TCampReservation
+        WHERE  UserIdOrEmail = #{userIdOrEmail}
+    </select>
+    
+    
+    <select id="getReservationDetail" parameterType="int" resultType="com.team3.camping.domain.ReservationVo">
+        SELECT a1.ReservationNo
+              ,a1.CampNo
+              ,b1.FacilityName
+              ,a1.UserIdOrEmail
+              ,a1.CheckInDate
+              
+              ,a1.CheckOutDate
+              ,a1.PeopleCount
+              ,a1.CampRoomNo
+              ,CASE 
+                   WHEN b1.StateCode != 100 THEN '캠핑장 사용 불가'
+                   WHEN a1.StateCode  = 900 THEN '보류'
+                   WHEN a1.StateCode  = 100 THEN '예약완료'
+                   ELSE '기타'
+               END AS StateCode
+        FROM   TCampReservation a1
+        INNER  JOIN TCampInfo b1 ON a1.CampNo = b1.CampNo
+        WHERE  ReserVationNo = #{intReservationNo}
+    </select>
+    
+    
+    <select id="getReservationWriter" parameterType="int" resultType="String">
+        SELECT UserIdOrEmail
+        FROM   TCampReservation
+        WHERE  ReservationNo = #{intReservationNo}
+    </select>
+    
+</mapper>

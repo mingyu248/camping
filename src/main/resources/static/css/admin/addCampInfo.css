@@ -1,0 +1,54 @@
+@charset "UTF-8";
+@charset "UTF-8";
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    margin: 0;
+}
+.file-input-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.file-input {
+    margin-right: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+    background-color: white;
+}
+input[type="file"] {
+    display: none; /* 파일 입력 숨기기 */
+}
+.custom-file-input {
+    padding: 10px 20px;
+    background-color: black; /* 버튼 배경색 */
+    color: white; /* 버튼 텍스트 색상 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.custom-file-input:hover {
+    background-color: #474747; /* 호버 시 배경색 */
+}
+.register-button {
+    padding: 10px 20px;
+    background-color: black; /* 버튼 배경색 */
+    color: white; /* 버튼 텍스트 색상 */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 340px;
+}
+.register-button:hover {
+    background-color: #474747; /* 호버 시 배경색 */
+}

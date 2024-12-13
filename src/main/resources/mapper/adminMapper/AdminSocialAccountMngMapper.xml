@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminSocialAccountMngMapper">
+
+	<select id="getSocialAccountPlatform" resultType="com.team3.camping.domain.naverAndGoogle.User">
+		SELECT Auth_Vendor
+		FROM   User_Tbl
+		GROUP BY Auth_Vendor
+	</select>
+	
+	<select id="getSocialAccountList" resultType="com.team3.camping.domain.UserInfoVo" parameterType="map">
+		SELECT UserNo, UserEmail, UserName, Platform, RegDate
+		      ,Role ,StateCode
+		FROM   (
+		        SELECT Id           AS UserNo
+		              ,Email        AS UserEmail
+		              ,Name         AS UserName
+		              ,Auth_vendor  AS Platform
+		              ,Created_date AS RegDate
+		              
+		              ,CASE
+		                   WHEN Role = 'USER'  THEN '사용자'
+		                   WHEN Role = 'ADMIN' THEN '관리자'
+		               END AS Role
+		              ,CASE
+		                   WHEN StateCode = 100 THEN '정상'
+		                   WHEN StateCode = 900 THEN '정지'
+		                   WHEN StateCode = 999 THEN '탈퇴대기'
+		               END AS StateCode
+		              ,ROW_NUMBER() OVER (
+		                                  ORDER BY Id
+		                                  ) AS rn
+		        FROM   User_Tbl
+		        <where>
+		        	<if test="emailOrId != null and emailOrId != ''">
+		        		Email LIKE '%' || #{emailOrId} || '%'
+		        	</if>
+		        	<if test="platform != null and platform != ''">
+		        		<if test="emailOrId != null and emailOrId != ''">AND</if>
+		        		Auth_Vendor = #{platform}
+		        	</if>
+		        	<if test="startDate != null and startDate != ''">
+						<if test="emailOrId != null or platform != ''">AND</if>
+						Created_Date > #{startDate}
+		        	</if>
+		        	<if test="endDate != null and endDate != ''">
+		        		<if test="emailOrId != null or platform != null or startDate != null">AND</if>
+		        		<![CDATA[
+		        		Created_Date < #{endDate}
+		        		]]>
+		        	</if>
+		        	<if test="stateCode != null and stateCode != ''">
+		        		<if test="emailOrId != null or platform != null or startDate != null or endDate != null">AND</if>
+		        		StateCode = #{stateCode}
+		        	</if>
+		        </where>
+		        )
+		WHERE   rn BETWEEN #{startRow} AND #{endRow}
+		ORDER BY rn
+	</select>
+	
+	<select id="getSocialAccountTotalCount" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM   User_Tbl
+		<where>
+        	<if test="emailOrId != null and emailOrId != ''">
+        		Email LIKE '%' || #{emailOrId} || '%'
+        	</if>
+        	<if test="platform != null and platform != ''">
+        		<if test="emailOrId != null and emailOrId != ''">AND</if>
+        		Auth_Vendor = #{platform}
+        	</if>
+        	<if test="startDate != null and startDate != ''">
+				<if test="emailOrId != null or platform != ''">AND</if>
+				Created_Date > #{startDate}
+        	</if>
+        	<if test="endDate != null and endDate != ''">
+        		<if test="emailOrId != null or platform != null or startDate != null">AND</if>
+        		<![CDATA[
+        		Created_Date < #{endDate}
+        		]]>
+        	</if>
+        	<if test="stateCode != null and stateCode != ''">
+        		<if test="emailOrId != null or platform != null or startDate != null or endDate != null">AND</if>
+        		StateCode = #{stateCode}
+        	</if>
+        </where>
+	</select>
+	
+	<select id="getSocialAccountDetail" resultType="com.team3.camping.domain.UserInfoVo" parameterType="int">
+		SELECT Id          AS UserNo
+		      ,Auth_Vendor AS Platform
+		      ,Email       AS UserEmail
+		      ,Name        AS UserName
+		      ,UserBirth
+		      
+		      ,Gender
+		      ,UserTelNum
+		      ,ZipCode
+		      ,BaseAddr
+		      ,DtlAddr
+		      
+		      ,Created_Date AS RegDate
+		      ,Modified_Date AS UpdDate
+		      ,CASE
+		      	   WHEN Role = 'USER'  THEN '사용자'
+		      	   WHEN Role = 'ADMIN' THEN '관리자'
+		       END AS Role
+		      ,CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '정지'
+		           WHEN StateCode = 999 THEN '탈퇴대기'
+		       END AS StateCode
+		      
+		FROM   User_Tbl
+		WHERE  Id = #{intUserNo}
+	</select>
+	
+	<select id="getSocialAccountHistory" resultType="com.team3.camping.domain.UserInfoVo" parameterType="int">
+		SELECT a.Auth_Vendor   AS Platform
+		      ,a.Id            AS UserNo
+		      ,a.Email         AS UserEmail
+		      ,a.Name          AS UserName
+		      ,b.UpdDate
+		      
+		      ,b.Reason
+		      ,adminId
+		      ,CASE
+		           WHEN b.StateCode = 100 THEN '정상'
+				   WHEN b.StateCode = 900 THEN '비활성화'
+				   WHEN b.StateCode = 999 THEN '탈퇴대기'
+		       END AS StateCode
+		FROM User_Tbl a INNER JOIN TUserHis b ON a.Email = b.UserIdOrEmail
+		WHERE a.Id = #{intUserNo}
+		ORDER BY b.UpdDate DESC
+	</select>
+	
+	<select id="getSocialCountByStatus" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '비활성화'
+		       END AS StateCode
+		      ,COUNT(*) Count
+		FROM   User_Tbl
+		GROUP BY StateCode
+	</select>
+</mapper>

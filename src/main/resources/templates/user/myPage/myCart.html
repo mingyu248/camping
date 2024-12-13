@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/user/userStyle.css}">
+    <script th:src="@{/js/user/myPage/myCart.js}"></script>
+    
+    <title>내 찜</title>
+</head>
+<body>
+    <header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="banner-container">
+        <div>
+            <p class="banner-text">마이페이지</p>
+        </div>
+        <div class="category-div">
+            <ul class="category-ul">
+                <li class="category-li li-no-active"><a href="/camping/user/my_info">회원 정보</a></li>
+                <li class="category-li li-active"><a href="/camping/user/my_cart" class="text-active">찜</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_review">내 후기</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_help">문의</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_reservation">예약 내역</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    
+    <div class="wrapper style1">
+        <div class="user-info-div">
+            <h3>찜 목록</h3>
+        </div>
+        <div class="inner">
+            <div class="camp-list-div">
+                <ul class="camp-ul">
+                    <li class="camp-li" th:each="cart :${cartList}">
+                        <div class="camp-img-div">
+                            <img class="camp-img" th:src="${cart.cartImgPath == null ? '/camping/images/common/noimg.jpg' : '/' + cart.cartImgPath}" alt="캠프 이미지" onerror="this.onerror=null; this.src='/camping/images/common/noimg.jpg';">
+                        </div>
+                        <div class="camp-info-div">
+                            <div class="cart-camp-info-div">
+                                <p class="camp-info-facility-name" th:text="${cart.facilityName}" th:onclick="location.href='/camping/user/camp_detail?camp_no='+[[${cart.campNo}]]"></p>
+                                <p class="camp-info-facility-features"><span th:text="${cart.facilityFeatures}"></span></p>
+                                <p class="camp-info-facility-features"><span th:text="${'주소 : ' + cart.landAddress}"></span></p>
+                            </div>
+                            <div class="cart-remove-button-div">
+                                <button th:onclick="cartDelet(/*[[${cart.campNo}]]*/)">찜 제거</button>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <div id="pagination" class="pagination">
+                    <span th:if="${searchOption.currentPage > 1}" class="page-item">
+                        <a th:onclick="movePage(/*[[${searchOption.currentPage - 1}]]*/)" class="page-link">이전</a>
+                    </span>
+                    
+                    <span th:each="page : ${searchOption.pageRange}" class="page-item" th:classappend="${page == searchOption.currentPage} ? 'active'">
+                        <a th:onclick="movePage(/*[[${page}]]*/)" th:text="${page}" class="page-link"></a>
+                    </span>
+                    
+                    <span th:if="${searchOption.currentPage < searchOption.totalPages}" class="page-item">
+                        <a th:onclick="movePage(/*[[${searchOption.currentPage + 1}]]*/)" class="page-link">다음</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <footer id="footer">
+        <div class="inner">
+            <div class="flex flex-3">
+                <div class="col">
+                    <h3>고객센터</h3>
+                    <ul class="alt">
+                        <li><a href="#">공지사항</a></li>
+                        <li><a href="/camping/user/help_regist">문의하기</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright">
+        &copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+        Made with: <a href="https://templated.co/">Templated.co</a>
+    </div>
+    <script th:src="@{/js/common/index/jquery.min.js}"></script>
+    <script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+    <script th:src="@{/js/common/index/skel.min.js}"></script>
+    <script th:src="@{/js/common/index/util.js}"></script>
+    <script th:src="@{/js/common/index/main.js}"></script>
+</body>
+</html>

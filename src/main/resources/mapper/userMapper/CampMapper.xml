@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.CampMapper">
+
+    <!-- 캠핑장 리스트 -->
+    <select id="getCampList" parameterType="map" resultType="com.team3.camping.domain.CampInfoVo">
+    
+        SELECT a.CampNo 
+              ,a.FacilityName
+              ,a.ProvinceName
+              ,a.CampingType
+              ,a.Electricity_Subfacility      as electricitySubfacility
+              
+              ,a.Hotwater_Subfacility         as hotWaterSubfacility
+              ,a.Wirelessinternet_Subfacility as wirelessInternetSubfacility
+              ,a.Firewoodsales_Subfacility    as firewoodSalesSubfacility
+              ,a.Walkingtrail_Subfacility     as walkingTrailSubfacility
+              ,a.Waterplayarea_Subfacility    as waterPlayAreaSubfacility
+              
+              ,a.Playground_Subfacility       as playgroundSubfacility
+              ,a.Mart_Subfacility             as martSubfacility
+              ,a.FacilityFeatures
+              ,b.ImagePath
+              ,CASE
+                   WHEN Suggestion IS NULL THEN 0
+                   ELSE Suggestion
+               END AS Suggestion
+              ,a.Views
+              ,CASE
+                   WHEN d.Review IS NULL THEN 0
+                   ELSE d.Review
+               END AS Review
+        FROM  (
+               SELECT CampNo 
+                     ,FacilityName
+                     ,ProvinceName
+                     ,CampingType
+                     ,Electricity_Subfacility
+                     
+                     ,Hotwater_Subfacility
+                     ,Wirelessinternet_Subfacility
+                     ,Firewoodsales_Subfacility
+                     ,Walkingtrail_Subfacility
+                     ,Waterplayarea_Subfacility
+                     
+                     ,Playground_Subfacility
+                     ,Mart_Subfacility
+                     ,FacilityFeatures
+                     ,Views
+               FROM (
+                     SELECT CampNo
+                           ,FacilityName
+                           ,ProvinceName
+                           ,CampingType
+                           ,Electricity_Subfacility
+                           
+                           ,Hotwater_Subfacility
+                           ,Wirelessinternet_Subfacility
+                           ,Firewoodsales_Subfacility
+                           ,Walkingtrail_Subfacility
+                           ,Waterplayarea_Subfacility
+                           
+                           ,Playground_Subfacility
+                           ,Mart_Subfacility
+                           ,FacilityFeatures
+                           ,Views
+                           ,ROW_NUMBER() OVER (ORDER BY CampNo ASC) AS rn
+                     FROM   TCampInfo
+                     WHERE  StateCode = 100
+                       <if test='searchKey != null'>
+                           AND  FacilityName LIKE '%' || #{searchKey} || '%'
+                       </if>
+                       <if test='provinceName != null'>
+                           AND  ProvinceName = #{provinceName}
+                       </if>
+                       <if test='businessEntity != null'>
+                           AND  BusinessEntity = #{businessEntity}
+                       </if>
+                       <if test='campingType != null'>
+                           AND  CampingType like '%' || #{campingType} || '%'
+                       </if>
+                       <if test='electricitySubfacility'>
+                           AND  Electricity_Subfacility      = 'Y'
+                       </if>
+                       <if test='hotWaterSubfacility'>
+                           AND  HotWater_Subfacility         = 'Y'
+                       </if>
+                       <if test='wirelessInternetSubfacility'>
+                           AND  Wirelessinternet_Subfacility = 'Y'
+                       </if>
+                       <if test='firewoodSalesSubfacility'>
+                           AND  Firewoodsales_Subfacility    = 'Y'
+                       </if>
+                       <if test='walkingTrailSubfacility'>
+                           AND  Walkingtrail_Subfacility     = 'Y'
+                       </if>
+                       <if test='waterPlayAreaSubfacility'>
+                           AND  Waterplayarea_Subfacility    = 'Y'
+                       </if>
+                       <if test='playgroundSubfacility'>
+                           AND  Playground_Subfacility       = 'Y'
+                       </if>
+                       <if test='martSubfacility'>
+                           AND  Mart_Subfacility             = 'Y'
+                       </if>
+                     ORDER BY CampNo ASC
+                    )
+               WHERE rn BETWEEN #{startRow} AND #{endRow}
+               ) a
+        LEFT JOIN   (
+                     SELECT CampNo, ImagePath
+                    ,ROW_NUMBER() OVER (
+                                        PARTITION BY CampNo ORDER BY ImagePath ASC
+                                        ) AS rn
+                     FROM TCampImg
+                     ) b
+               ON    a.CampNo = b.CampNo
+              AND    b.rn     = 1
+        LEFT JOIN   (
+                     SELECT CampNo, COUNT(*) AS Suggestion
+                     FROM   TCampSuggestion
+                     GROUP BY CampNo
+                     ) c
+               ON    c.CampNo = a.CampNo
+        LEFT JOIN   (
+                     SELECT CampNo, COUNT(*) AS Review
+                     FROM   TReview
+                     GROUP BY CampNo
+                     ) d
+               ON    d.CampNo = a.CampNo
+    </select>
+    
+    <!-- 검색된 캠핑장 총 갯수 -->
+    <select id="getCampTotalCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   TCampInfo
+        WHERE  StateCode = 100
+          <if test='searchKey != null'>
+              AND  FacilityName LIKE '%' || #{searchKey} || '%'
+          </if>
+          <if test='provinceName != null'>
+              AND  ProvinceName = #{provinceName}
+          </if>
+          <if test='businessEntity != null'>
+              AND  BusinessEntity = #{businessEntity}
+          </if>
+          <if test='campingType != null'>
+              AND  CampingType like '%' || #{campingType} || '%'
+          </if>
+          <if test='electricitySubfacility'>
+              AND  Electricity_Subfacility      = 'Y'
+          </if>
+          <if test='hotWaterSubfacility'>
+              AND  HotWater_Subfacility         = 'Y'
+          </if>
+          <if test='wirelessInternetSubfacility'>
+              AND  Wirelessinternet_Subfacility = 'Y'
+          </if>
+          <if test='firewoodSalesSubfacility'>
+              AND  Firewoodsales_Subfacility    = 'Y'
+          </if>
+          <if test='walkingTrailSubfacility'>
+              AND  Walkingtrail_Subfacility     = 'Y'
+          </if>
+          <if test='waterPlayAreaSubfacility'>
+              AND  Waterplayarea_Subfacility    = 'Y'
+          </if>
+          <if test='playgroundSubfacility'>
+              AND  Playground_Subfacility       = 'Y'
+          </if>
+          <if test='martSubfacility'>
+              AND  Mart_Subfacility             = 'Y'
+          </if>
+    </select>
+    
+    <!-- 캠핑장 상세 정보 -->
+    <select id="getCampDetail" parameterType="int" resultType="com.team3.camping.domain.CampInfoVo">
+        SELECT CampNo
+              ,FacilityName
+              ,FacilityFeatures
+              ,Electricity_Subfacility      as electricitySubfacility
+              ,Hotwater_Subfacility         as hotWaterSubfacility
+              ,Wirelessinternet_Subfacility as wirelessInternetSubfacility
+              
+              ,Firewoodsales_Subfacility    as firewoodSalesSubfacility
+              ,Walkingtrail_Subfacility     as walkingTrailSubfacility
+              ,Waterplayarea_Subfacility    as waterPlayAreaSubfacility
+              ,Playground_Subfacility       as playgroundSubfacility
+              ,Mart_Subfacility             as martSubfacility
+              
+              ,FacilityIntroduction
+              ,LandAddress
+              ,RoadAddress
+              ,TelNumber
+              ,CampingType
+        
+              ,SpringOperation
+              ,SummerOperation
+              ,AutumnOperation
+              ,WinterOperation
+              ,WeekdayOperation
+              
+              ,WeekendOperation
+              ,Website
+              ,Latitude
+              ,Longitude
+        FROM   TCampInfo
+        WHERE  CampNo = #{campNo}
+    </select>
+    
+    <!-- 인기 캠핑장 4개 -->
+    <select id="getPopularCampList" resultType="com.team3.camping.domain.CampInfoVo">
+        SELECT a2.CampNo
+              ,a2.FacilityName
+              ,a2.Suggestion
+              ,a2.rn
+              ,b2.ImagePath
+        FROM  (
+               SELECT a.CampNo 
+                     ,a.FacilityName
+                     ,CASE
+                          WHEN b.Suggestion IS NULL THEN 0
+                          ELSE b.Suggestion
+                     END AS Suggestion
+                    ,ROW_NUMBER() OVER (ORDER BY b.Suggestion DESC NULLS LAST) AS rn
+               FROM TCampInfo a
+               LEFT JOIN   (
+                            SELECT CampNo, COUNT(*) AS Suggestion
+                            FROM   TCampSuggestion
+                            GROUP BY CampNo
+                            ORDER BY Suggestion DESC
+                            ) b
+                      ON    b.CampNo = a.CampNo
+                     AND    a.StateCode = 100
+               ) a2
+        LEFT JOIN   (
+                     SELECT CampNo, ImagePath
+                    ,ROW_NUMBER() OVER (
+                                        PARTITION BY CampNo ORDER BY ImagePath ASC
+                                        ) AS rn
+                     FROM   TCampImg
+                     ) b2
+          ON    a2.CampNo = b2.CampNo
+          AND   b2.rn     = 1
+        WHERE   a2.rn BETWEEN 1 AND 10
+        ORDER BY a2.rn ASC
+    </select>
+    
+    <!-- 캠핑장 상세페이지 이미지 경로들 -->
+    <select id="getCampImgPathList" parameterType="int" resultType="String">
+        SELECT ImagePath
+        FROM   TCampImg
+        WHERE  CampNo = #{campNo}
+    </select>
+    
+    <!-- 조회수 증가 -->
+    <update id="campViewIncrease" parameterType="int">
+        UPDATE TCampInfo
+        SET    Views  = Views + 1
+        WHERE  CampNo = #{intCampNo}
+    </update>
+    
+    
+</mapper>

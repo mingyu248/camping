@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminReservationMngMapper">
+	
+	<select id="getUserCampReservationList" resultType="com.team3.camping.domain.ReservationVo" parameterType="map">
+		SELECT ReservationNo, ProvinceName, City_Gun_GuName, FacilityName, UserIdOrEmail
+		      ,CheckInDate, CheckOutDate, RegDate, StateCode
+		FROM  (
+		       SELECT b.ReservationNo
+		             ,a.ProvinceName
+		             ,a.City_Gun_GuName
+		             ,a.FacilityName
+		             ,b.UserIdOrEmail
+		              
+		             ,b.CheckInDate
+		             ,b.CheckOutDate
+		             ,b.RegDate
+		             ,CASE
+		                  WHEN b.StateCode = 100 THEN '정상'
+		                  WHEN b.StateCode = 900 THEN '보류'
+		              END AS StateCode
+		             ,ROW_NUMBER() OVER (
+		                                 ORDER BY b.RegDate  DESC
+		                                 ) AS rn
+		       FROM   TCampInfo a INNER JOIN TCampReservation b ON a.CampNo = b.CampNo
+		       <where>
+		           <if test="userAccount != null and userAccount != ''">
+		           		b.UserIdOrEmail LIKE '%' || #{userAccount} || '%'
+		           </if>
+		           <if test="provinceName != null and provinceName != ''">
+		               <if test="userAccount != null and userAccount != ''">AND</if>
+		               a.ProvinceName = #{provinceName}
+		           </if>
+		           <if test="cityGunGuName != null and cityGunGuName != ''">
+		               <if test="userAccount != null or provinceName != null">AND</if>
+		               a.City_Gun_GuName = #{cityGunGuName}
+		           </if>
+		           <if test="facilityName != null and facilityName != ''">
+		               <if test="userAccount != null or provinceName != null or cityGunGuName != null">AND</if>
+		               a.FacilityName LIKE '%' || #{facilityName} || '%'
+		           </if>
+		           <if test="startDate != null and startDate != ''">
+		               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null">AND</if>
+		               b.RegDate > #{startDate}
+		           </if>
+		           <if test="endDate != null and endDate != ''">
+		               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null or startDate != null">AND</if>
+		               <![CDATA[
+		               b.RegDate < #{endDate}
+		               ]]>
+		           </if>
+		           <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+		               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null">AND</if>
+		               b.RegDate BETWEEN #{startDate} AND #{endDate}
+		           </if>
+		           <if test="stateCode != null and stateCode != ''">
+		               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null or startDate != null or endDate != null">AND</if>
+		               b.StateCode = #{stateCode}
+		           </if>
+		       </where>
+		       )
+		WHERE  rn BETWEEN #{startRow} AND #{endRow}
+		ORDER BY rn
+	</select>
+	
+	<select id="getUserCampReservationTotalCount" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+       	FROM   TCampInfo a INNER JOIN TCampReservation b ON a.CampNo = b.CampNo
+       	<where>
+           <if test="userAccount != null and userAccount != ''">
+           		b.UserIdOrEmail LIKE '%' || #{userAccount} || '%'
+           </if>
+           <if test="provinceName != null and provinceName != ''">
+               <if test="userAccount != null and userAccount != ''">AND</if>
+               a.ProvinceName = #{provinceName}
+           </if>
+           <if test="cityGunGuName != null and cityGunGuName != ''">
+               <if test="userAccount != null or provinceName != null">AND</if>
+               a.City_Gun_GuName = #{cityGunGuName}
+           </if>
+           <if test="facilityName != null and facilityName != ''">
+               <if test="userAccount != null or provinceName != null or cityGunGuName != null">AND</if>
+               a.FacilityName LIKE '%' || #{facilityName} || '%'
+           </if>
+           <if test="startDate != null and startDate != ''">
+               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null">AND</if>
+               b.RegDate > #{startDate}
+           </if>
+           <if test="endDate != null and endDate != ''">
+               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null or startDate != null">AND</if>
+               <![CDATA[
+               b.RegDate < #{endDate}
+               ]]>
+           </if>
+           <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null">AND</if>
+               b.RegDate BETWEEN #{startDate} AND #{endDate}
+           </if>
+           <if test="stateCode != null and stateCode != ''">
+               <if test="userAccount != null or provinceName != null or cityGunGuName != null or facilityName != null or startDate != null or endDate != null">AND</if>
+               b.StateCode = #{stateCode}
+           </if>
+       </where>
+	</select>
+	
+	<select id="getCampReservationCountByStatus" resultType="com.team3.camping.domain.ReservationVo">
+		SELECT CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '보류'
+		       END      AS StateCode
+		      ,COUNT(*) AS Count
+		FROM   TCampReservation
+		GROUP BY StateCode
+	</select>
+	
+	<select id="getReservationDetailInfo" resultType="com.team3.camping.domain.ReservationVo" parameterType="int">
+		SELECT b.ReservationNo
+		      ,b.UserIdOrEmail
+		      ,a.ProvinceName
+		      ,a.City_Gun_GuName
+		      ,a.FacilityName
+		      
+		      ,b.CampRoomNo
+		      ,b.PeopleCount
+		      ,b.CheckInDate
+		      ,b.CheckOutDate
+		      ,b.RegDate
+		      
+		      ,CASE
+		           WHEN b.StateCode = 100 THEN '정상'
+		           WHEN b.StateCode = 900 THEN '보류'
+		       END AS StateCode
+		FROM   TCampInfo a INNER JOIN TCampReservation b ON a.CampNo = b.CampNo
+		WHERE  ReservationNo = #{intReservationNo}
+	</select>
+	
+	<select id="getReservationHistoryList" resultType="com.team3.camping.domain.ReservationVo" parameterType="int">
+		SELECT ReservationHisNo
+		      ,ReservationNo
+		      ,UpdDate
+		      ,AdminId
+		      ,CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '보류'
+		       END AS StateCode
+		FROM   TCampReservationHis
+		WHERE  ReservationNo = #{intReservationNo}
+		ORDER BY UpdDate DESC
+	</select>
+</mapper>

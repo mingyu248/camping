@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>예약 현황</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="user_title">예약 현황</h2>
+    	<div id="sub-category">
+		    <ul class="sub-links">
+		        <li><a href="/camping/main">최근 30일간 현황</a></li>
+		        <li><a href="/camping/admin/user_statistics">회원 현황(자체 서비스)</a></li>
+		        <li><a href="/camping/admin/social_statistics">회원 현황(소셜 로그인)</a></li>
+		        <li><a href="/camping/admin/camp_statistics">캠핑장 현황</a></li>
+		        <li><a href="/camping/admin/reservation_statistics">예약 현황</a></li>
+		        <li><a href="/camping/admin/help_statistics">문의 현황</a></li>
+		    </ul>
+		</div>
+		<div class="row">
+			<div class="column">
+				<h3 class="chartTitle">지역별 예약 현황</h3>
+				<div class="chart-container">
+			    	<canvas id="provinceReservationChart"></canvas>
+				</div>
+			</div>
+			<div class="column">
+				<h3 class="chartTitle">시/군/구 별 예약 현황
+					<select id="provinceName">
+						<option value="">지역선택</option>
+						<option th:each="province:${provinceName}" th:value="${province.provinceName}" th:utext="${province.provinceName}"></option>
+					</select>
+				</h3>
+				<div class="chart-container">
+			    	<canvas id="cityGunGuReservationChart"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="column">
+				<h3 class="chartTitle">주간 예약 현황</h3>
+				<div class="chart-container">
+			    	<canvas id="regWeekReservationChart"></canvas>
+				</div>
+			</div>
+			<div class="column">
+				<h3 class="chartTitle">월간 예약 현황</h3>
+				<div class="chart-container">
+			    	<canvas id="regMonthReservationChart"></canvas>
+				</div>
+			</div>
+		</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved.<br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+<script th:inline="javascript">
+	document.addEventListener('DOMContentLoaded', function() {
+		
+		const provinceStatistics  = /*[[${provinceStatistics}]]*/ [];
+		const cityGunGuStatistics = /*[[${cityGunGuStatistics}]]*/ [];
+		const regWeekStatistics   = /*[[${regWeekStatistics}]]*/ [];
+		const regMonthStatistics  = /*[[${regMonthStatistics}]]*/ [];
+		
+		console.log('provinceStatistics : ', provinceStatistics);
+		console.log('cityGunGuStatistics : ', cityGunGuStatistics);
+		console.log('regWeekStatistics : ', regWeekStatistics);
+		console.log('regMonthStatistics : ', regMonthStatistics);
+		
+		const provinceLabels = provinceStatistics.map(item => item.provinceName);
+		const provinceData   = provinceStatistics.map(item => item.count);
+		
+		const provinceReservationChart = new Chart(document.getElementById('provinceReservationChart').getContext('2d'), {
+			type: 'bar',
+		    data: {
+		        labels: provinceLabels,
+		        datasets: [{
+		            label: '예약 수',
+		            data: provinceData,
+		            backgroundColor: '#1976D2',
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        responsive: false,
+		        scales: {
+		            x: {
+		                ticks: {
+		                    autoSkip: false,
+		                    maxRotation: 90,
+		                    minRotation: 0
+		                },
+		                grid: {
+		                    display: true
+		                }
+		            },
+		            y: {
+		            	beginAtZero: true,
+		                min: 0,
+		                max: 30,
+		                ticks: {
+		                    stepSize: 5
+		                }
+		            }
+		        },
+		        plugins: {
+		            legend: {
+		                position: 'top',
+		            },
+		        }
+		    }
+		});
+		
+		const cityGunGuLabels = cityGunGuStatistics.map(item => item.cityGunGuName);
+		const cityGunGuData   = cityGunGuStatistics.map(item => item.count);
+		
+		const cityGunGuReservationChart = new Chart(document.getElementById('cityGunGuReservationChart').getContext('2d'), {
+			type: 'bar',
+		    data: {
+		        labels: cityGunGuLabels,
+		        datasets: [{
+		            label: '캠핑장 수',
+		            data: cityGunGuData,
+		            backgroundColor: '#23610f',
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        responsive: false,
+		        scales: {
+		            x: {
+		                ticks: {
+		                    autoSkip: false,
+		                    maxRotation: 90,
+		                    minRotation: 0
+		                },
+		                grid: {
+		                    display: true
+		                }
+		            },
+		            y: {
+		            	beginAtZero: true,
+		                min: 0,
+		                max: 50,
+		                ticks: {
+		                    stepSize: 10
+		                }
+		            }
+		        },
+		        plugins: {
+		            legend: {
+		                position: 'top',
+		            },
+		        }
+		    }
+		});
+		
+		const regWeekLabels = regWeekStatistics.map(item => item.regWeek);
+		const regWeekData   = regWeekStatistics.map(item => item.count);
+		
+		const regWeekReservationChart = new Chart(document.getElementById('regWeekReservationChart').getContext('2d'), {
+		    type: 'bar',
+		    data: {
+		        labels: regWeekLabels,
+		        datasets: [{
+		            label: '예약 수',
+		            data: regWeekData,
+		            backgroundColor: '#1976D2',
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        responsive: false,
+		        scales: {
+		            x: {
+		                ticks: {
+		                    autoSkip: false,
+		                    maxRotation: 90,
+		                    minRotation: 0
+		                },
+		                grid: {
+		                    display: true
+		                }
+		            },
+		            y: {
+		            	beginAtZero: true,
+		                min: 0,
+		                max: 50,
+		                ticks: {
+		                    stepSize: 10
+		                }
+		            }
+		        },
+		        plugins: {
+		            legend: {
+		                position: 'top',
+		            },
+		        }
+		    }
+		});
+		
+		const regMonthLabels = regWeekStatistics.map(item => item.regWeek);
+		const regMonthData   = regWeekStatistics.map(item => item.count);
+		
+		const regMonthReservationChart = new Chart(document.getElementById('regMonthReservationChart').getContext('2d'), {
+		    type: 'bar',
+		    data: {
+		        labels: regMonthLabels,
+		        datasets: [{
+		            label: '예약 수',
+		            data: regMonthData,
+		            backgroundColor: '#FF6384',
+		            borderWidth: 1,
+		        }]
+		    },
+		    options: {
+		        responsive: false,
+		        scales: {
+		            x: {
+		                ticks: {
+		                    autoSkip: false,
+		                    maxRotation: 90,
+		                    minRotation: 0
+		                },
+		                grid: {
+		                    display: true
+		                }
+		            },
+		            y: {
+		            	beginAtZero: true,
+		                min: 0,
+		                max: 50,
+		                ticks: {
+		                    stepSize: 10
+		                }
+		            }
+		        },
+		        plugins: {
+		            legend: {
+		                position: 'top',
+		            },
+		        }
+		    }
+		});
+		
+		function updateCityGunGuChart(data) {
+			cityGunGuReservationChart.data.labels = data.map(item => item.cityGunGuName);
+			cityGunGuReservationChart.data.datasets[0].data = data.map(item => item.count);
+			cityGunGuReservationChart.update();
+		}
+		
+		document.getElementById('provinceName').addEventListener('change', updateReservationChart);
+		
+		function updateReservationChart() {
+			const provinceName = $('#provinceName').val();
+			console.log("Province Name : ", provinceName);
+			
+			$.ajax({
+				url: '/camping/admin/reservation_by_province',
+				type: 'GET',
+				data: {
+					provinceName: provinceName
+				},
+				success: function(data) {
+					updateCityGunGuChart(data);
+				},
+				error: function(xhr) {
+					alert('서버 오류: ' + xhr.statusText);
+				}
+			});
+		}
+	});
+</script>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<!-- principal 전체 출력 -->
+    <!-- <p>principal(유저정보) : <span sec:authentication="principal"></span><br></p> -->
+    <span th:if="${userId != null}" th:text="${userId} + '님 로그인 하셨습니다'"></span>
+    <span th:if="${userId == null}" >로그아웃 상태</span>
+
+	<hr>
+    
+    <div id="grid">
+          <div class="login_text">
+              <p>- LOGIN -</p>
+          </div>
+          <div id="loginformdiv">
+              <div id="input_container">
+                  <form action="/camping/login" method="post">
+                      <label for="" class="input_label">아이디</label> <br>
+                      <input type="text" id="userId" name="userId" class="input_value" required > <br>
+                      <label for="" class="input_label">비밀번호</label> <br>
+                      <input type="password" id="userPwd" name="userPwd" class="input_value" required > <br>
+                      <input type="submit" class="input_button_login" value="LOGIN"> <br> <br>
+                  </form>
+              </div>
+          </div>
+          <div id="a_container">
+              <a href="join" class="do_join">회원가입</a>
+          </div>
+    </div>
+
+	<!-- 로그인이 안되었을 때 -->
+	<div sec:authorize="isAnonymous()" class="m-2">
+
+		<!-- test : OAauth 인증 링크 거치지 않고 바로 이동하도록 조치 -->
+		<a th:href="@{'/oauth2/authorization/naver'}" class="btn btn-secondary active m-2">Naver Login</a>
+
+		<a th:href="@{'/oauth2/authorization/google'}" class="btn btn-secondary active m-2">Google Login</a>
+
+	</div>
+
+	<!-- 로그인 되었을 때 -->
+	<div sec:authorize="isAuthenticated()" class="m-2">
+
+		<!-- <div th:if="${#authentication.principal.attributes.kakao_account == null}">구글, 네이버</div> -->
+
+		<div>
+		속성 : [[${session.user}]]
+		<hr>
+		</div>
+
+		<!-- 인증 포털에 따른 조치 -->
+
+		<!-- 1차 방안 -->
+		<!-- 공통적인 조치 : 포털 공통-->
+		<b>인증 포털 공통</b> : <span th:if="${session.user != null}" th:text="${session.user.name} + '님 로그인 하셨습니다.'"></span>
+
+		<br>
+    
+		<!-- 2차 방안 : 포털별 차별화 조치 -->
+		<!-- 네이버 -->
+		<span th:if="${session.user != null && session.user.authVendor == 'naver'}" th:text="${session.user.email} + '님 로그인 하셨습니다.'">
+		</span>
+
+		<!-- google -->
+		<span th:if="${session.user != null && session.user.authVendor == 'google'}" th:text="${session.user.name} + '님 로그인 하셨습니다.'">
+		</span>
+
+		<hr>
+
+	  	<!-- 로그아웃 링크 추가 -->
+	  	<a th:href="@{'/logout'}" class="btn btn-info active ml-2">Logout</a>
+    </div>
+
+</body>
+</html>

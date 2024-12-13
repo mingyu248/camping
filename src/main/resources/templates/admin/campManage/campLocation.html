@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=#"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/campManage/campManage.js}"></script>
+<title>캠핑장 위치</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="page_title" th:text="${campDetail.facilityName}"></h2>
+    	<div class="wrapper">
+	        <div class="camp_info_menu">
+	            <ul class="camp_menu">
+	                <li th:onclick="|location.href='@{/admin/camp_detail(no=${campDetail.campNo})}'|">소개</li>
+	                <li class="active" th:onclick="|location.href='@{/admin/camp_location(no=${campDetail.campNo})}'|">위치</li>
+	                <li th:onclick="|location.href='@{/admin/camp_review(no=${campDetail.campNo})}'|">후기</li>
+	                <li th:onclick="|location.href='@{/admin/camp_reservation(no=${campDetail.campNo})}'|">예약 내역</li>
+	            </ul>
+	        </div>
+	    </div>
+	    <div class="contour">
+	    	<div class="separator"></div>
+	    </div>
+	    <div class="camp_map_area">
+	    	<div id="staticMap" class="camp_map"></div>
+	    </div> 
+	    <div class="contour">
+	    	<div class="separator"></div>
+	    </div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+<script th:inline="javascript">
+	const campLocation = /*[[${campDetail}]]*/ [];
+
+	const campLatitude = campLocation.latitude;
+	const campLongitude = campLocation.longitude;
+	
+	var markerPosition  = new kakao.maps.LatLng(campLatitude, campLongitude); 
+
+	var marker = {
+	    position: markerPosition
+	};
+
+	var staticMapContainer  = document.getElementById('staticMap'),     // 이미지 지도를 표시할 div  
+	    staticMapOption = { 
+	        center: new kakao.maps.LatLng(campLatitude, campLongitude), // 이미지 지도의 중심좌표
+	        level: 3,      // 이미지 지도의 확대 레벨
+	        marker: marker // 이미지 지도에 표시할 마커 
+	    };    
+
+	// 이미지 지도를 생성합니다
+	var staticMap = new kakao.maps.StaticMap(staticMapContainer, staticMapOption);
+	
+	function setDraggable(draggable) {
+	    // 마우스 드래그로 지도 이동 가능여부를 설정합니다
+	    staticMap.setDraggable(draggable);    
+	}
+	//var mapTypeControl = new kakao.maps.MapTypeControl();
+	//staticMap.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+	//var zoomControl = new kakao.maps.ZoomControl();
+	//staticMap.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+</script>
+</html>

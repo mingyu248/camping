@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{css/common/index.css}">
+    <title>Document</title>
+</head>
+<body>
+
+
+    <div class="tab-inner">
+        <input type="radio" id="tab1" name="tabmenu" checked="">
+        <input type="radio" id="tab2" name="tabmenu">
+        <input type="radio" id="tab3" name="tabmenu">
+        <div class="tabs">
+            <div class="items">
+                <div>
+                    <h1><a href="/camping/main">ㅅㅂㅋㅋ</a></h1>
+                </div>
+                <div>
+                    <h1><a href="/camping/main">Logo</a></h1>
+                </div>
+                <div>
+                    <h1><a href="/camping/main">Logo</a></h1>
+                </div>
+            </div>
+        </div>
+        <div class="btn">
+            <label for="tab1">Top</label>
+            <label for="tab2">Bottom</label>
+            <label for="tab3">Set Up</label>
+        </div>
+    </div>
+
+</body>
+<script>
+    const tabs = document.querySelectorAll('input[name="tabmenu"]');
+    let currentIndex = 0;
+
+    window.addEventListener('wheel', (event) => {
+        if (event.deltaY > 0) {
+            // 아래로 스크롤
+            currentIndex = (currentIndex + 1) % tabs.length; // 다음 탭
+        } else {
+            // 위로 스크롤
+            currentIndex = (currentIndex - 1 + tabs.length) % tabs.length; // 이전 탭
+        }
+        tabs[currentIndex].checked = true; // 선택된 탭 변경
+        event.preventDefault(); // 기본 스크롤 방지
+    });
+</script>
+</html>

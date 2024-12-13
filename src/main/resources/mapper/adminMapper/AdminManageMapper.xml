@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminManageMapper">
+
+	<select id="getAdminOrUserList" resultType="com.team3.camping.domain.UserInfoVo" parameterType="map">
+
+		SELECT UserNo, UserId, UserName, UserEmail, UserTelNum
+		      ,RegDate, StateCode, Role
+        FROM (
+              SELECT a.UserNo
+                    ,a.UserId
+                    ,a.UserName
+                    ,a.UserEmail
+                    ,a.UserTelNum
+
+                    ,a.RegDate
+                    ,CASE
+                         WHEN b.StateCode = 100 THEN '정상'
+                         WHEN b.StateCode = 900 THEN '정지'
+                         WHEN b.StateCode = 999 THEN '탈퇴대기'
+                     END AS StateCode
+                    ,CASE
+                         WHEN c.Role = 'ROLE_ADMIN' THEN '관리자'
+                         WHEN c.Role = 'ROLE_USER'  THEN '사용자'
+                     END AS Role
+                    ,ROW_NUMBER() OVER (ORDER BY a.UserNo DESC) AS rn
+              FROM   TUserInfo a INNER JOIN (
+                                             SELECT UserIdOrEmail, StateCode, UpdDate
+                                            ,ROW_NUMBER() OVER (
+                                                                PARTITION BY UserIdOrEmail ORDER BY UpdDate DESC
+                                                                ) AS rn
+                                             FROM TUserHis
+            ) b ON  a.UserId = b.UserIdOrEmail
+                AND b.rn     = 1
+            INNER JOIN TUserRoles c ON a.UserId = c.UserId
+            WHERE  c.Role = #{role}
+            <if test="userId != null and userId != ''">
+              AND  a.UserId LIKE '%' || #{adminId} || '%'
+            </if>
+            <if test="startDate != null and startDate != ''">
+              AND  a.RegDate > #{startDate}
+            </if>
+            <if test="endDate != null and endDate != ''">
+              <![CDATA[
+              AND a.RegDate < #{endDate}
+              ]]>
+            </if>
+            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+              AND a.RegDate BETWEEN #{startDate} AND #{endDate}
+            </if>
+            <if test="stateCode != null and stateCode != ''">
+              AND b.StateCode = #{stateCode}
+            </if>
+        	)
+        WHERE rn BETWEEN #{startRow} AND #{endRow}
+        ORDER BY rn
+	</select>
+	
+	<select id="getAdminOrUserTotalCount" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM   TUserInfo a INNER JOIN TUserHis   b ON a.UserId = b.UserIdOrEmail
+		                   INNER JOIN TUserRoles c ON a.UserId = c.UserId
+		WHERE  b.UpdDate = (
+		                    SELECT MAX(b2.UpdDate)
+		                    FROM   TUserHis b2
+		                    WHERE  a.UserId = b2.UserIdOrEmail
+		                    )
+		  AND  c.Role = #{role}
+	    <if test="adminId != null and adminId != ''">
+          AND  a.UserId LIKE '%' || #{adminId} || '%'
+        </if>
+        <if test="startDate != null and startDate != ''">
+          AND  a.RegDate > #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+          <![CDATA[
+          AND a.RegDate < #{endDate}
+          ]]>
+        </if>
+        <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+          AND a.RegDate BETWEEN #{startDate} AND #{endDate}
+        </if>
+        <if test="stateCode != null and stateCode != ''">
+          AND b.StateCode = #{stateCode}
+        </if>
+	</select>
+	
+	<select id="getAdminOrUserCountByStatus" resultType="com.team3.camping.domain.UserInfoVo" parameterType="String">
+		WITH UserCounts AS (
+						    SELECT CASE
+						               WHEN b.StateCode = 100 THEN '정상'
+						               WHEN b.StateCode = 900 THEN '정지'
+						               WHEN b.StateCode = 999 THEN '탈퇴대기'
+						           END AS StateCode,
+						           COUNT(*) AS Count
+						    FROM   TUserInfo a 
+						           INNER JOIN TUserHis b ON a.UserId = b.UserIdOrEmail
+						           INNER JOIN TUserRoles c ON a.UserId = c.UserId
+						    WHERE  b.UpdDate = (
+								                SELECT MAX(b2.UpdDate)
+								                FROM   TUserHis b2
+								                WHERE  a.UserId = b2.UserIdOrEmail
+								                )
+						      AND   c.Role = #{strUserRole}
+						    GROUP BY b.StateCode
+							)
+							SELECT StateCode, Count FROM UserCounts
+							UNION ALL
+							SELECT '합계', SUM(Count) FROM UserCounts
+	</select>
+	
+	<select id="getAdminOrUserDetailInfo" resultType="com.team3.camping.domain.UserInfoVo" parameterType="map">
+		SELECT UserNo, UserId, UserName, UserEmail, UserTelNum
+		      ,UserBirth, RegDate, UpdDate, StateCode, Role
+		      ,Gender, ZipCode, BaseAddr, DtlAddr
+        FROM (
+              SELECT a.UserNo
+                    ,a.UserId
+                    ,a.UserName
+                    ,a.UserEmail
+                    ,a.UserTelNum
+                    
+                    ,a.UserBirth
+                    ,CASE
+                         WHEN a.Gender = 'm' THEN '남성'
+                         WHEN a.Gender = 'f' THEN '여성'
+                     END AS Gender
+                    ,a.ZipCode
+                    ,a.BaseAddr
+                    ,a.DtlAddr
+
+                    ,a.RegDate
+                    ,b.UpdDate
+                    ,CASE
+                         WHEN b.StateCode = 100 THEN '정상'
+                         WHEN b.StateCode = 900 THEN '비활성화'
+                         WHEN b.StateCode = 999 THEN '탈퇴대기'
+                     END AS StateCode
+                    ,CASE
+                         WHEN c.Role = 'ROLE_ADMIN' THEN '관리자'
+                         WHEN c.Role = 'ROLE_USER'  THEN '사용자'
+                     END AS Role
+                    ,ROW_NUMBER() OVER (ORDER BY a.UserNo DESC) AS rn
+              FROM   TUserInfo a INNER JOIN (
+                                             SELECT UserIdOrEmail, StateCode, UpdDate
+                                            ,ROW_NUMBER() OVER (
+                                                                PARTITION BY UserIdOrEmail ORDER BY UpdDate DESC
+                                                                ) AS rn
+                                             FROM TUserHis
+            ) b ON  a.UserId = b.UserIdOrEmail
+                AND b.rn     = 1
+            INNER JOIN TUserRoles c ON a.UserId = c.UserId
+            WHERE  c.Role = #{role}
+              AND  UserNo = #{adminNo}
+        )
+	</select>
+	
+	<select id="getAdminOrUserHistory" resultType="com.team3.camping.domain.UserInfoVo" parameterType="int">
+		SELECT a.UserNo
+		      ,a.UserId
+		      ,a.UserName
+		      ,b.UpdDate
+		      ,b.Reason
+		      
+		      ,b.AdminId
+		      ,CASE
+		            WHEN b.StateCode = 100 THEN '정상'
+		            WHEN b.StateCode = 900 THEN '비활성화'
+		            WHEN b.StateCode = 999 THEN '탈퇴대기'
+		       END AS StateCode
+		FROM   TUserInfo a INNER JOIN TUserHis b ON a.UserId = b.UserIdOrEmail
+		WHERE  a.UserNo = #{intAdminNo}
+		ORDER BY b.UpdDate DESC
+	</select>
+</mapper>

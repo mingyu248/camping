@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.CartMapper">
+    
+    <!-- 찜 목록 추가 -->
+    <insert id="addCart" parameterType="com.team3.camping.domain.CartVo">
+        INSERT INTO TCartHis(
+                              CartNo, UserIdOrEmail, CampNo
+                             )
+                      VALUES( 
+                             CartNo_SEQ.NEXTVAL, #{userIdOrEmail}, #{campNo}
+                             )
+    </insert>
+    
+    <!-- 찜 중복 체크 -->    
+    <select id="cartCheck" parameterType="com.team3.camping.domain.CartVo" resultType="int">
+        SELECT COUNT(*)
+        FROM   TCartHis
+        WHERE  UserIdOrEmail = #{userIdOrEmail}
+          AND  CampNo        = #{campNo}
+    </select>
+    
+    <!-- 찜 삭제 -->
+    <delete id="cartDelete" parameterType="com.team3.camping.domain.CartVo">
+        DELETE TCartHis
+        WHERE  CampNo        = #{campNo}
+          AND  UserIdOrEmail = #{userIdOrEmail}
+    </delete>
+    
+    <!-- 찜 목록 리스트 -->
+    <select id="getCartList" parameterType="List" resultType="com.team3.camping.domain.CartVo">
+        SELECT CartNo
+              ,CampNo
+              ,UserIdOrEmail
+              ,RegDate
+              ,FacilityName
+              
+              ,Electricity_Subfacility      as electricitySubfacility
+              ,Hotwater_Subfacility         as hotWaterSubfacility
+              ,Wirelessinternet_Subfacility as wirelessInternetSubfacility
+              ,Firewoodsales_Subfacility    as firewoodSalesSubfacility
+              ,Walkingtrail_Subfacility     as walkingTrailSubfacility
+              
+              ,Waterplayarea_Subfacility    as waterPlayAreaSubfacility
+              ,Playground_Subfacility       as playgroundSubfacility
+              ,Mart_Subfacility             as martSubfacility
+              ,FacilityFeatures
+              ,ImagePath as CartImgPath
+              
+              ,RowNo
+              ,LandAddress
+        FROM   
+              (
+               SELECT a.CartNo
+                     ,a.CampNo
+                     ,a.UserIdOrEmail
+                     ,a.RegDate
+                     ,b.FacilityName
+                     
+                     ,b.Electricity_Subfacility
+                     ,b.Hotwater_Subfacility
+                     ,b.Wirelessinternet_Subfacility
+                     ,b.Firewoodsales_Subfacility
+                     ,b.Walkingtrail_Subfacility
+                     
+                     ,b.Waterplayarea_Subfacility
+                     ,b.Playground_Subfacility
+                     ,b.Mart_Subfacility
+                     ,b.FacilityFeatures
+                     ,c.ImagePath
+                     
+                     ,ROW_NUMBER() OVER (
+                                         ORDER BY a.RegDate DESC
+                                         ) AS RowNo
+                     ,b.LandAddress
+               FROM   TCartHis a
+               INNER JOIN TCampInfo b 
+                       ON a.CampNo = b.CampNo
+                      AND a.UserIdOrEmail = #{userKey}
+                      AND b.StateCode = 100
+               LEFT JOIN (
+                          SELECT CampNo, ImagePath
+                         ,ROW_NUMBER() OVER (
+                                             PARTITION BY CampNo ORDER BY ImagePath ASC
+                                             ) AS rn
+                          FROM TCampImg
+                          ) c
+                      ON  b.CampNo = c.CampNo
+                     AND  c.rn     = 1
+               )
+        WHERE RowNo BETWEEN #{startRow} AND #{endRow}
+    </select>
+    
+    <select id="getCampTotalCount" parameterType="map" resultType="int">
+        SELECT COUNT(*)
+        FROM   TCartHis a
+        INNER JOIN TCampInfo b 
+                ON a.CampNo = b.CampNo
+               AND a.UserIdOrEmail = #{userKey}
+               AND b.StateCode = 100
+    </select>
+    
+</mapper>

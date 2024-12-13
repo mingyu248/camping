@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminStatisticsMngMapper">
+
+	<select id="getUserStatisticsByThirtyDays" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT TRUNC(RegDate) AS RegDate
+		      ,COUNT(*)       AS Count
+		FROM   TUserInfo
+		WHERE  RegDate >= SYSDATE - INTERVAL '30' DAY
+		GROUP BY TRUNC(RegDate)
+		ORDER BY RegDate
+	</select>
+
+	<select id="getSocialStatisticsByThirtyDays" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT TRUNC(Created_Date) AS RegDate
+		      ,COUNT(*)            AS Count
+		FROM   User_Tbl
+		WHERE  Created_Date >= SYSDATE - INTERVAL '30' DAY
+		GROUP BY TRUNC(Created_Date)
+		ORDER BY RegDate
+	</select>
+
+	<select id="getReservationStatisticsByThiryDays" resultType="com.team3.camping.domain.ReservationVo">
+		SELECT TRUNC(RegDate) AS RegDate
+		      ,COUNT(*)       AS Count
+		FROM   TCampReservation
+		WHERE  RegDate >= SYSDATE - INTERVAL '30' DAY
+		GROUP BY TRUNC(RegDate)
+		ORDER BY RegDate
+	</select>
+
+	<select id="getUserStatisticsByGender" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT CASE
+		           WHEN a.Gender = 'm'   THEN '남성'
+		           WHEN a.Gender = 'f'   THEN '여성'
+		           WHEN a.Gender IS NULL THEN '미선택'
+		       END      AS Gender
+		      ,COUNT(*) AS Count
+		FROM   TUserInfo a INNER JOIN TUserRoles b ON a.UserId = b.UserId
+		WHERE  b.Role = 'ROLE_USER'
+		GROUP BY a.Gender
+	</select>
+
+	<select id="getUserStatisticsByAgeGroup" resultType="com.team3.camping.domain.UserInfoVo">
+		<![CDATA[
+		SELECT CASE 
+		           WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 20 THEN '10대'
+		           WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 30 THEN '20대'
+		           WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 40 THEN '30대'
+		           WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 50 THEN '40대'
+		           WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 60 THEN '50대'
+		           WHEN UserBirth IS NULL THEN '미선택'
+		           ELSE '60대 이상'
+		        END      AS AgeGroup,
+		        COUNT(*) AS Count
+		FROM 
+		    TUserInfo a JOIN TUserRoles b ON a.UserId = b.UserId
+		WHERE b.Role = 'ROLE_USER'
+		GROUP BY CASE 
+			         WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 20 THEN '10대'
+			         WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 30 THEN '20대'
+			         WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 40 THEN '30대'
+			          WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 50 THEN '40대'
+			         WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 60 THEN '50대'
+			         WHEN UserBirth IS NULL THEN '미선택'
+			         ELSE '60대 이상'
+			     END
+		ORDER BY AgeGroup
+		]]>
+	</select>
+	
+	<select id="getUserStatisticsByStatus" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT CASE
+		           WHEN b.StateCode = 100 THEN '정상'
+		           WHEN b.StateCode = 900 THEN '정지'
+		           WHEN b.StateCode = 999 THEN '탈퇴대기'
+		       END      AS StateCode
+		      ,COUNT(*) AS Count
+		FROM   TUserInfo a INNER JOIN TUserHis b ON a.UserId = b.UserIdOrEmail
+		                   INNER JOIN TUserRoles c ON a.UserId = c.UserId
+		WHERE  c.Role = 'ROLE_USER'
+		GROUP BY b.StateCode
+		ORDER BY b.StateCode
+	</select>
+
+	<select id="getSocialStatisticsByPlatform" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT Auth_Vendor AS Platform
+		      ,COUNT(*)    AS Count
+		FROM   User_Tbl
+		GROUP BY Auth_Vendor
+	</select>
+
+	<select id="getSocialStatisticsByGender" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT CASE
+		           WHEN Gender = 'm'   THEN '남성'
+		           WHEN Gender = 'f'   THEN '여성'
+		           WHEN Gender IS NULL THEN '미선택'
+		       END      AS Gender
+		      ,COUNT(*) AS Count
+		FROM   User_Tbl
+		GROUP BY Gender
+	</select>
+	
+	<select id="getSocialStatisticsByAgeGroup" resultType="com.team3.camping.domain.UserInfoVo">
+		<![CDATA[
+		SELECT CASE 
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 20 THEN '10대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 30 THEN '20대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 40 THEN '30대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 50 THEN '40대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 60 THEN '50대'
+		            WHEN UserBirth IS NULL THEN '미선택'
+		            ELSE '60대 이상'
+		        END      AS AgeGroup
+		       ,COUNT(*) AS Count
+		FROM    User_Tbl
+		GROUP BY CASE 
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 20 THEN '10대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 30 THEN '20대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 40 THEN '30대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 50 THEN '40대'
+		            WHEN FLOOR(MONTHS_BETWEEN(SYSDATE, UserBirth) / 12) < 60 THEN '50대'
+		            WHEN UserBirth IS NULL THEN '미선택'
+		            ELSE '60대 이상'
+		        END
+		ORDER BY AgeGroup
+		]]>
+	</select>
+	
+	<select id="getSocialStatisticByStatus" resultType="com.team3.camping.domain.UserInfoVo">
+		SELECT CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '정지'
+		           WHEN StateCode = 999 THEN '탈퇴대기'
+		       END      AS StateCode
+		      ,COUNT(*) AS Count
+		FROM   User_Tbl
+		GROUP BY StateCode
+		ORDER BY StateCode
+	</select>
+	
+	<select id="getCampStatisticsByProvince" resultType="com.team3.camping.domain.CampInfoVo">
+		SELECT ProvinceName
+		      ,COUNT(*) AS Count
+		FROM   TCampInfo
+		GROUP BY ProvinceName
+		ORDER BY ProvinceName ASC
+	</select>
+	
+	<select id="getCampStatisticsByCityGunGu" resultType="com.team3.camping.domain.CampInfoVo" parameterType="String">
+		SELECT City_Gun_GuName
+		      ,COUNT(*) AS Count
+		FROM   TCampInfo
+		WHERE  ProvinceName = #{strProvinceName}
+		GROUP BY City_Gun_GuName
+		ORDER BY City_Gun_GuName ASC
+	</select>
+	
+	<select id="getHelpStatisticsByStatus" resultType="com.team3.camping.domain.HelpVo">
+		SELECT CASE
+		           WHEN StateCode = 100 THEN '답변완료'
+		           WHEN StateCode = 200 THEN '답변전'
+		       END AS StateCode
+		      ,COUNT(*) Count
+		FROM   THelp
+		GROUP BY StateCode
+	</select>
+	
+	<select id="getHelpStatisticsByRegWeek" resultType="com.team3.camping.domain.HelpVo">
+		SELECT TO_CHAR(TRUNC(RegDate, 'IW')) AS RegWeek
+		      ,COUNT(*)                      AS Count
+		FROM   THelp
+		GROUP BY TO_CHAR(TRUNC(RegDate, 'IW'))
+		ORDER BY RegWeek
+	</select>
+
+	<select id="getHelpStatisticsByRegMonth" resultType="com.team3.camping.domain.HelpVo">
+		SELECT TO_CHAR(RegDate, 'YYYY-MM') AS RegMonth
+		      ,COUNT(*)                    AS Count
+		FROM   THelp
+		WHERE  RegDate >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
+		GROUP BY TO_CHAR(RegDate, 'YYYY-MM')
+		ORDER BY RegMonth
+	</select>
+	
+	<select id="getReservationStatisticsByProvince" resultType="com.team3.camping.domain.ReservationVo">
+		SELECT a.ProvinceName
+		      ,COUNT(*) AS Count
+		FROM   TCampInfo a INNER JOIN TCampReservation b ON a.CampNo = b.CampNo
+		GROUP BY a.ProvinceName
+	</select>
+	
+	<select id="getReservationStatisticsByCityGunGu" resultType="com.team3.camping.domain.ReservationVo">
+		SELECT a.City_Gun_GuName
+		      ,COUNT(*) AS Count
+		FROM   TCampInfo a INNER JOIN TCampReservation b ON a.CampNo = b.CampNo
+		WHERE  a.ProvinceName = #{strProvinceName}
+		GROUP BY a.City_Gun_GuName
+	</select>
+	
+	<select id="getReservationStatisticsByRegWeek" resultType="com.team3.camping.domain.ReservationVo">
+		SELECT TO_CHAR(TRUNC(RegDate, 'IW')) AS RegWeek
+		      ,COUNT(*)                      AS Count
+		FROM   TCampReservation
+		GROUP BY TO_CHAR(TRUNC(RegDate, 'IW'))
+		ORDER BY RegWeek
+	</select>
+	
+	<select id="getReservationStatisticsByRegMonth" resultType="com.team3.camping.domain.ReservationVo">
+		SELECT TO_CHAR(RegDate, 'YYYY-MM') AS RegMonth
+		      ,COUNT(*)                    AS Count
+		FROM   TCampReservation
+		WHERE  RegDate >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -12)
+		GROUP BY TO_CHAR(RegDate, 'YYYY-MM')
+		ORDER BY RegMonth
+	</select>
+</mapper>

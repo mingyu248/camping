@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/reservationManage/reservationManage.js}"></script>
+<title>예약 상세정보</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="reservation_title">예약 상세정보</h2>
+    	<div id="sub-category">
+		    <ul class="sub-links">
+		        <li><a th:href="@{/admin/reservation_detail(no=${reservationDetail.reservationNo})}">예약 상세정보</a></li>
+		        <li><a th:href="@{/admin/reservation_history(no=${reservationDetail.reservationNo})}">상세내역</a></li>
+		    </ul>
+		</div>
+    	<div class="reservation_detail_area">
+    		<div class="reservation_detail_info">
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">번호</label>
+    				<span th:text="${reservationDetail.reservationNo}" id="reservationNo"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">시설명</label>
+    				<span th:text="${reservationDetail.facilityName}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">계정</label>
+    				<span th:text="${reservationDetail.userIdOrEmail}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">방 번호</label>
+    				<span th:text="${reservationDetail.campRoomNo} + '번 방'"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">인원</label>
+    				<span th:text="${reservationDetail.peopleCount} + '명'"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">체크 인</label>
+    				<span th:text="${#dates.format(reservationDetail.checkInDate, 'yyyy년 MM월 dd일') + ' 16시 00분'}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">체크 아웃</label>
+    				<span th:text="${#dates.format(reservationDetail.checkOutDate, 'yyyy년 MM월 dd일') + ' 11시 00분'}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">예약일</label>
+    				<span th:text="${#dates.format(reservationDetail.regDate, 'yyyy년 MM월 dd일 HH시 mm분')}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">지역명</label>
+    				<span th:text="${reservationDetail.provinceName}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">시/군/구</label>
+    				<span th:text="${reservationDetail.cityGunGuName}"></span>
+    			</div>
+    			<div class="reservation_detail_item">
+    				<label class="reservation_detail_label">상태</label>
+    				<span th:text="${reservationDetail.stateCode}" th:class="${(reservationDetail.stateCode == '정상') ? 'status_normal' : 
+		  						                                               (reservationDetail.stateCode == '보류') ? 'status_stopped' : ''}"></span>
+    			</div>
+    		</div>
+    		<div class="btn_group">
+			    <button th:if="${reservationDetail.stateCode == '정상'}" onclick="holdReservation()">보류</button>
+			    <button th:if="${reservationDetail.stateCode == '정상'}" onclick="deleteReservation()">삭제</button>
+			    
+			    <button th:if="${reservationDetail.stateCode == '보류'}" onclick="activateReservation()">보류 취소</button>
+			    <button th:if="${reservationDetail.stateCode == '보류'}" onclick="deleteReservation()">삭제</button>
+			    <button onclick="location.href='/camping/admin/reservation_manage'">목록으로</button>
+			</div>
+    	</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved.<br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+</html>

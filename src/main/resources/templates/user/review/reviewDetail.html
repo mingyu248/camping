@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+	<script th:src="@{/js/user/review/review.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/user/userStyle.css}">
+    
+    <title>리뷰 상세</title>
+</head>
+<body>
+    
+    <header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="banner-container">
+        <div>
+            <p class="banner-text" th:text="${camp.facilityName}"></p>
+            <p class="banner-text-small" th:text="${camp.facilityFeatures}"></p>
+        </div>
+        <div class="category-div">
+            <ul class="category-ul" th:if="${pageInfo == 'campPage'}">
+                <li class="category-li li-no-active"><a href="/camping/user/camp_list" class="text-active">캠핑장 목록</a></li>
+                <li class="category-li li-no-active"><a th:href="'/camping/user/camp_detail?camp_no=' + ${campNo}" class="text-active">소개</a></li>
+                <li class="category-li li-no-active"><a th:href="'/camping/user/camp_detail_location?camp_no=' + ${campNo}">위치</a></li>
+                <li class="category-li li-active"><a th:href="'/camping/user/camp_detail_review?camp_no=' + ${campNo}">후기</a></li>
+                <li class="category-li li-no-active"><a th:href="'/camping/user/camp_detail_reservation?camp_no=' + ${campNo}">예약</a></li>
+            </ul>
+            <ul class="category-ul" th:if="${pageInfo == 'myPage'}">
+                <li class="category-li li-no-active"><a href="/camping/user/my_info">회원 정보</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_cart" class="text-active">찜</a></li>
+                <li class="category-li li-active"><a href="/camping/user/my_review">내 후기</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_help">문의</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_reservation">예약 내역</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="wrapper style1">
+        
+        <div class="user-info-div">
+            <h3>리뷰 상세</h3>
+        </div>
+        <div class="inner">
+            <div class="camp-detail-review-div">
+                <hr>
+                <!--  -->
+                <div class="review-detail-div">
+                    <div class="review-title-div">
+                        <p class="review-title" th:text="${reviewDetail.reviewTitle}"></p>
+                        <p class="review-info" th:text="${reviewDetail.userIdOrEmail + ' | '+ #dates.format(reviewDetail.regDate, 'yyyy년 MM월 dd일') + ' | 조회수 ' + reviewDetail.views}"></p>
+                        
+                    </div>
+                    <div>
+                        <hr>
+                        <div class="image-container">
+                            <img th:src="${reviewDetail.reviewImgPath}" class="review-image"/>
+                        </div>
+                        <div class="review-detail-text-div">
+                            <pre class="review-detail" th:text="${reviewDetail.reviewDetail}"></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="review-button-div">
+                    <button th:if="${userKey == reviewDetail.userIdOrEmail}" th:onclick="location.href='/camping/user/review_update?review_no=' + [[${reviewDetail.reviewNo}]] + '&page_info=' + [[${pageInfo}]]">수정</button>
+                    <button th:if="${userKey == reviewDetail.userIdOrEmail}" th:onclick="reviewDelete(/*[[${reviewDetail.reviewNo}]], [[${campNo}]], [[${pageInfo}]]*/)">삭제</button>
+
+                    <button th:if="${pageInfo == 'campPage'}" th:onclick="window.location.href='/camping/user/camp_detail_review?camp_no=[[${campNo}]]'">목록으로</button>
+                    <!-- <button th:if="${pageInfo == 'myPage'}" onclick="window.location.href='/camping/user/my_review'">목록으로</button> -->
+                    <button onclick="window.history.back()">돌아가기</button>
+                </div>
+                
+                <hr>
+                
+                <div class="board-comment">
+                	<div class="comment-input-container">
+            	       <textarea id="comment"  placeholder="댓글을 남겨보세요." required></textarea>
+            	       <button class="registBtn" th:onclick="'registComment(\'' + ${reviewDetail.reviewNo} + '\')'"> 댓글 작성</button>
+            	    </div>
+                </div>
+                
+                <ul class="comments-list">
+                	<li class="comment-item" th:each="comment : ${commentList}">
+                		<div class="comments-user">
+                			<p class="comment-userid" th:text="${comment.userIdOrEmail}"></p>
+                			<pre class="my-comment" th:text="${comment.comments}"></pre>
+                			<textarea class="new-comment" id="comment-${comment.reviewCommentNo}" placeholder="내용을 입력해 주세요." th:text="${comment.comments}" required></textarea>
+                			<p class="comment-regdate" th:text="'작성일 : ' + ${#dates.format(comment.regDate, 'yyyy년 MM월 dd일')}"></p>
+                			
+                			<div class="comment-actions">
+        	                    <button class="update-ready-botton" th:if="${userId == comment.userIdOrEmail || userKey == comment.userIdOrEmail}" th:onclick="updateReady(this)">수정</button>
+        	                    <button class="update-ok" th:if="${userId == comment.userIdOrEmail || userKey == comment.userIdOrEmail}" th:onclick="updateOk(this, /*[[${comment.reviewCommentNo}]]*/)"  >확인</button>
+        	                    <button class="update-cancel" th:if="${userId == comment.userIdOrEmail || userKey == comment.userIdOrEmail}" onclick="updateCancel(this)" style="display: none;">취소</button>
+        	                    <button class="delete-commnet" th:if="${userId == comment.userIdOrEmail || userKey == comment.userIdOrEmail}" th:onclick="'deleteComment(\'' + ${comment.reviewCommentNo} + '\')'">삭제</button>
+        	                </div>
+        	                
+                		</div>
+                	</li>	
+                </ul>
+            </div>
+        </div>
+    </div>
+    <footer id="footer">
+        <div class="inner">
+            <div class="flex flex-3">
+                <div class="col">
+                    <h3>고객센터</h3>
+                    <ul class="alt">
+                        <li><a href="#">공지사항</a></li>
+                        <li><a href="/camping/user/help_regist">문의하기</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright">
+        &copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+        Made with: <a href="https://templated.co/">Templated.co</a>
+    </div>
+    <script th:src="@{/js/common/index/jquery.min.js}"></script>
+    <script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+    <script th:src="@{/js/common/index/skel.min.js}"></script>
+    <script th:src="@{/js/common/index/util.js}"></script>
+    <script th:src="@{/js/common/index/main.js}"></script>
+</body>
+</html>

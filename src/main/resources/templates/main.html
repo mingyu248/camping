@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--
+	Broadcast by TEMPLATED
+	templated.co @templatedco
+	Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
+--><html lang="ko" 
+         xmlns:th="http://www.thymeleaf.org"
+	     xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+	<head>
+		<title>MAIN</title>
+		<meta charset="utf-8">
+		<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" th:href="@{/css/common/main.css}">
+	</head>
+	<body>
+
+		<!-- Header -->
+		<header id="header">
+			<h1><a href="#">LOGO<span></span></a></h1>
+			<a href="#menu">메뉴</a>
+		</header>
+
+		<!-- Nav -->
+		<nav id="menu">
+            <ul class="links">
+                
+                <li>
+                    <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+                </li> 
+                <li><a href="/camping/main">홈</a></li>
+                <li><a href="/camping/user/camp_list">캠핑장</a></li>
+                <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+                <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+                <li>
+                    <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+                </li>
+            </ul>
+        </nav>
+		<section id="banner" data-video="images/banner">
+			<div class="inner">
+				<header>
+					<h1>캠핑장 정보 어디에서 찾으세요?</h1>
+					<p>지자체 운영 야영장 및 국립공원, 자연휴양림, 국민여가 캠핑장</p>
+				</header>
+				<a href="#main" class="button big alt scrolly">캠핑장 정보</a>
+			</div>
+
+		</section>
+
+		<!-- Main -->
+		<div id="main">
+
+			<!-- One -->
+			<section class="wrapper style1">
+				<div class="inner">
+					<header class="align-center">
+						<h2>캠핑장 정보</h2>
+						<p>회원 추천 별 캠핑장 정보</p>
+					</header>
+					<!-- 2 Column Video Section -->
+                    
+                        <div class="flex flex-2">
+                            <div class="video col" th:each="popularCamp :${popularCampList}">
+                                <div class="image fit">
+                                    <img id="main_img" th:src="${popularCamp.imagePath == null ? '/camping/images/common/noimg.jpg' : '/' + popularCamp.imagePath}" alt="캠프 이미지" onerror="this.onerror=null; this.src='/camping/images/common/noimg.jpg';">
+                                </div>
+                                <div class="main-camp-info-div">
+                                    <p class="caption" th:text="${popularCamp.facilityName}" th:onclick="location.href='/camping/user/camp_detail?camp_no='+[[${popularCamp.campNo}]]"></p>
+                                    <div class="suggestion-div">
+                                        <img class="good-icon" src="/camping/images/user/icon/good.png">
+                                        <p class="camp-info-suggestion" th:text="${popularCamp.suggestion}"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+						<div class="more">
+							<a href="/camping/user/camp_list">더보기</a>
+						</div>
+				</div>
+			</section>
+		</div>
+
+		<!-- Footer -->
+		<footer id="footer">
+			<div class="inner">
+				<div class="flex flex-3">
+					<div class="col">
+						<h3>고객센터</h3>
+						<ul class="alt">
+							<li><a href="#">공지사항</a></li>
+							<li><a href="#">문의하기</a></li>
+							<li><a href="#">개인정보처리방침</a></li>
+							<li><a href="#">서비스이용약관</a></li>
+							<li><a href="#">운영정책</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</footer>
+		<div class="copyright">
+			&copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+			Made with: <a href="https://templated.co/">Templated.co</a>
+		</div>
+
+		<!-- Scripts -->
+		<script th:src="@{/js/common/index/jquery.min.js}"></script>
+		<script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+		<script th:src="@{/js/common/index/skel.min.js}"></script>
+		<script th:src="@{/js/common/index/util.js}"></script>
+		<script th:src="@{/js/common/index/main.js}"></script>
+	</body>
+</html>

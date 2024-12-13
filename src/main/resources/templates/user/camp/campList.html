@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{/js/user/camp/camp.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/user/userStyle.css}">
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <script th:inline="javascript">let searchOption = /*[[${searchOption}]]*/[];</script>
+
+    <title>캠핑장 리스트</title>
+</head>
+<body>
+    
+    <header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="banner-container" id="bannerContainer">
+        <div>
+            <p class="banner-text">캠핑장</p>
+        </div>
+        
+        <!-- 검색 -->
+        <div class="search-div">
+            <input type="text" id="searchKey" class="search-input" placeholder="캠핑장 검색" th:value="${searchOption.searchKey}">
+            <button class="search-button" onclick="search()">검색</button>
+            <select id="limit" class="select-limit" onchange="search()">
+                <option value="5" th:selected="${searchOption.limit == 5}">5개씩 보기</option>
+                <option value="10" th:selected="${searchOption.limit == 10}">10개씩 보기</option>
+                <option value="15" th:selected="${searchOption.limit == 15}">15개씩 보기</option>
+                <option value="20" th:selected="${searchOption.limit == 20}">20개씩 보기</option>
+                <option value="25" th:selected="${searchOption.limit == 25}">25개씩 보기</option>
+                <option value="30" th:selected="${searchOption.limit == 30}">30개씩 보기</option>
+            </select>
+        </div>
+        <div>
+            <p onclick="toggleOption()" id="optionShowText" class="open-show-text">상세옵션 열기</p>
+        </div>
+        <div class="search-option-container" id="searchOptionContainer">
+            <div class="option-select">
+                <select id="provinceName" class="search-select-box">
+                    <option value="" th:selected="${searchOption.provinceName == null}">지역</option>
+                    <option value="서울특별시" th:selected="${searchOption.provinceName == '서울특별시'}">서울특별시</option>
+                    <option value="부산광역시" th:selected="${searchOption.provinceName == '부산광역시'}">부산광역시</option>
+                    <option value="대구광역시" th:selected="${searchOption.provinceName == '대구광역시'}">대구광역시</option>
+                    <option value="인천광역시" th:selected="${searchOption.provinceName == '인천광역시'}">인천광역시</option>
+                    <option value="광주광역시" th:selected="${searchOption.provinceName == '광주광역시'}">광주광역시</option>
+                    <option value="대전광역시" th:selected="${searchOption.provinceName == '대전광역시'}">대전광역시</option>
+                    <option value="울산광역시" th:selected="${searchOption.provinceName == '울산광역시'}">울산광역시</option>
+                    <option value="세종특별자치시" th:selected="${searchOption.provinceName == '세종특별자치시'}">세종특별자치시</option>
+                    <option value="경기도" th:selected="${searchOption.provinceName == '경기도'}">경기도</option>
+                    <option value="강원도" th:selected="${searchOption.provinceName == '강원도'}">강원도</option>
+                    <option value="충청북도" th:selected="${searchOption.provinceName == '충청북도'}">충청북도</option>
+                    <option value="충청남도" th:selected="${searchOption.provinceName == '충청남도'}">충청남도</option>
+                    <option value="전라북도" th:selected="${searchOption.provinceName == '전라북도'}">전라북도</option>
+                    <option value="전라남도" th:selected="${searchOption.provinceName == '전라남도'}">전라남도</option>
+                    <option value="경상북도" th:selected="${searchOption.provinceName == '경상북도'}">경상북도</option>
+                    <option value="경상남도" th:selected="${searchOption.provinceName == '경상남도'}">경상남도</option>
+                    <option value="제주특별자치도" th:selected="${searchOption.provinceName == '제주특별자치도'}">제주특별자치도</option>
+                </select>
+                <select id="businessEntity" class="search-select-box">
+                    <option value="" th:selected="${searchOption.businessEntity == null}">운영형태</option>
+                    <option value="지자체" th:selected="${searchOption.businessEntity == '지자체'}">지자체</option>
+                    <option value="국립공원" th:selected="${searchOption.businessEntity == '국립공원'}">국립공원</option>
+                    <option value="자연휴양림" th:selected="${searchOption.businessEntity == '자연휴양림'}">자연휴양림</option>
+                    <option value="국민여가" th:selected="${searchOption.businessEntity == '국민여가'}">국민여가</option>
+                    <option value="민간" th:selected="${searchOption.businessEntity == '민간'}">민간</option>
+                </select>
+                <select id="campingType" class="search-select-box">
+                    <option value="" th:selected="${searchOption.campingType == null}">주요시설</option>
+                    <option value="일반야영장" th:selected="${searchOption.campingType == '일반야영장'}">일반야영장</option>
+                    <option value="자동차야영장" th:selected="${searchOption.campingType == '자동차야영장'}">자동차야영장</option>
+                    <option value="카라반" th:selected="${searchOption.campingType == '카라반'}">카라반</option>
+                    <option value="글램핑" th:selected="${searchOption.campingType == '글램핑'}">글램핑</option>
+                    <option value="캠프닉" th:selected="${searchOption.campingType == '캠프닉'}">캠프닉</option>
+                </select>
+            </div>  
+            <div class="search-checkbox-contailner">
+                <p>부대시설</p>
+                <input type="checkBox" id="electricitySubfacility" th:checked="${searchOption.electricitySubfacility}"><label class="checkbox-label" for="electricitySubfacility">전기</label>
+                <input type="checkBox" id="hotWaterSubfacility" th:checked="${searchOption.hotWaterSubfacility}"><label for="hotWaterSubfacility">온수</label>
+                <input type="checkBox" id="wirelessInternetSubfacility" th:checked="${searchOption.wirelessInternetSubfacility}"><label for="wirelessInternetSubfacility">무선인터넷</label>
+                <input type="checkBox" id="firewoodSalesSubfacility" th:checked="${searchOption.firewoodSalesSubfacility}"><label for="firewoodSalesSubfacility">장작판매</label>
+                <input type="checkBox" id="walkingTrailSubfacility" th:checked="${searchOption.walkingTrailSubfacility}"><label for="walkingTrailSubfacility">산책로</label>
+                
+                <input type="checkBox" id="waterPlayAreaSubfacility" th:checked="${searchOption.waterPlayAreaSubfacility}"><label for="waterPlayAreaSubfacility">물놀이장</label>
+                <input type="checkBox" id="playgroundSubfacility" th:checked="${searchOption.playgroundSubfacility}"><label for="playgroundSubfacility">놀이터</label>
+                <input type="checkBox" id="martSubfacility" th:checked="${searchOption.martSubfacility}"><label for="martSubfacility">마트</label>
+            </div>
+        </div>
+    </div>
+    
+    <div class="wrapper style1">
+        <div class="user-info-div">
+            <h3>캠핑장</h3>
+        </div>
+        <div class="inner">
+            <div class="camp-list-div">
+                <ul class="camp-ul">
+                    <li class="camp-li" th:each="camp :${campList}">
+                        <input text="hidden" th:value="${camp.campNo}" hidden>
+                        <div class="camp-img-div">
+                            <img class="camp-img" th:src="${camp.imagePath == null ? '/camping/images/common/noimg.jpg' : '/' + camp.imagePath}" alt="캠프 이미지" onerror="this.onerror=null; this.src='/camping/images/common/noimg.jpg';">
+                        </div>
+                        <div class="camp-info-div">
+                            <div class="count-info">
+                                <img src="/camping/images/user/icon/good.png">
+                                <p class="camp-info-count" th:text="${camp.suggestion}"></p>
+                                <img src="/camping/images/user/icon/eye.png">
+                                <p class="camp-info-count" th:text="${camp.views}"></p>
+                                <img src="/camping/images/user/icon/review.png">
+                                <p class="camp-info-count" th:text="${camp.review}"></p>
+                            </div>
+                            <p class="camp-info-facility-name" th:text="${camp.facilityName}" th:onclick="location.href='/camping/user/camp_detail?camp_no='+[[${camp.campNo}]]"></p>
+                            <p class="camp-info-facility-features"><span th:text="${camp.facilityFeatures}"></span></p>
+                            <p class="camp-info-camping-type"><span th:text="${'캠핑장 유형 : ' + camp.campingType}"></span></p>
+                            <p class="camp-info-province-name"><span th:text="${'지역 : ' + camp.provinceName}"></span></p>
+                            
+                        </div>
+                        
+                        <div class="camp-facility">
+                            <div th:if="${#strings.equals(camp.electricitySubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/electricity.png"><p>전기</p></div>
+                            <div th:if="${#strings.equals(camp.hotWaterSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/hot_water.png"><p>온수</p></div>
+                            <div th:if="${#strings.equals(camp.wirelessInternetSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/wifi.png"><p>인터넷</p></div>
+                            <div th:if="${#strings.equals(camp.firewoodSalesSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/fire_wood.png"><p>장작판매</p></div>
+                            <div th:if="${#strings.equals(camp.walkingTrailSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/walking.png"><p>산책로</p></div>
+                            <div th:if="${#strings.equals(camp.waterPlayAreaSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/swimming_pool.png"><p>물놀이장</p></div>
+                            <div th:if="${#strings.equals(camp.playgroundSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/playground.png"><p>놀이터</p></div>
+                            <div th:if="${#strings.equals(camp.martSubfacility, 'Y')}" class="icon-info"><img src="/camping/images/common/icon/mart.png"><p>마트</p></div>
+                        </div>
+                    </li>
+                </ul>
+                
+                <div id="pagination" class="pagination">
+                    <span th:if="${searchOption.currentPage > 1}" class="page-item">
+                        <a th:onclick="movePage(/*[[${searchOption.currentPage - 1}]]*/)" class="page-link">이전</a>
+                    </span>
+                    
+                    <span th:each="page : ${searchOption.pageRange}" class="page-item" th:classappend="${page == searchOption.currentPage} ? 'active'">
+                        <a th:onclick="movePage(/*[[${page}]]*/)" th:text="${page}" class="page-link"></a>
+                    </span>
+                    
+                    <span th:if="${searchOption.currentPage < searchOption.totalPages}" class="page-item">
+                        <a th:onclick="movePage(/*[[${searchOption.currentPage + 1}]]*/)" class="page-link">다음</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer id="footer">
+        <div class="inner">
+            <div class="flex flex-3">
+                <div class="col">
+                    <h3>고객센터</h3>
+                    <ul class="alt">
+                        <li><a href="#">공지사항</a></li>
+                        <li><a href="/camping/user/help_regist">문의하기</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright">
+        &copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+        Made with: <a href="https://templated.co/">Templated.co</a>
+    </div>
+    <script th:src="@{/js/common/index/jquery.min.js}"></script>
+    <script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+    <script th:src="@{/js/common/index/skel.min.js}"></script>
+    <script th:src="@{/js/common/index/util.js}"></script>
+    <script th:src="@{/js/common/index/main.js}"></script>
+</body>
+</html>

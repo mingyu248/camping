@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.UserMapper">
+    
+    <!-- 아이디 중복 체크 -->
+    <select id="userDuplicateCheck" parameterType="String" resultType="int">
+        SELECT COUNT(*)
+        FROM   TUserInfo
+        WHERE  UserId = #{strUserId}
+    </select>
+    
+    <!-- 유저 정보 저장 -->
+    <insert id="userInfoRegist" parameterType="com.team3.camping.domain.UserInfoVo">
+        INSERT INTO TUserInfo(
+                              UserId, UserNo, UserPwd, UserName, UserBirth
+                             ,Gender, UserEmail, UserTelNum, ZipCode, BaseAddr
+                             ,DtlAddr
+                              )
+                       VALUES(
+                              #{userId}, UserNo_SEQ.NEXTVAL, #{userPwd}, #{userName}, #{userBirth}
+                             ,#{gender}, #{userEmail}, #{userTelNum}, #{zipCode}, #{baseAddr}
+                             ,#{dtlAddr}
+                              )
+    </insert>
+    
+    <!-- 회원 기록 저장 -->
+    <insert id="userHisRegist" parameterType="String">
+        INSERT INTO TUserHis(
+                             UserHisNo, UserIdOrEmail, UpdDate
+                             )
+                      VALUES(
+                             UserHisNo_SEQ.NEXTVAL, #{userId}, SYSDATE
+                             )
+    </insert>
+    
+    <!-- 회원 권한 저장 -->
+    <insert id="userRoleRegist" parameterType="String">
+        INSERT INTO TUserRoles(
+                               User_Role_Num, UserId, Role
+                               )
+                        VALUES(
+                               RoleNo_SEQ.NEXTVAl, #{userIdOrEmail}, 'ROLE_USER'
+                               )
+    </insert>
+    
+    <!-- 유저 정보 가져오기(자체로그인) -->
+    <select id="getUserInfo" parameterType="String" resultType="com.team3.camping.domain.UserInfoVo">
+        SELECT UserId
+		      ,UserEmail
+		      ,UserPwd
+		      ,ZipCode
+		      ,BaseAddr
+        
+              ,DtlAddr
+              ,UserBirth
+              ,CASE
+                   WHEN Gender = 'm' THEN '남성'
+                   WHEN Gender = 'f' THEN '여성'
+               END "gender"
+              ,UserName
+              ,UserTelNum
+        FROM   TUserInfo
+        WHERE  UserId = #{strUserKey}
+    </select>
+    
+    <!-- 유저 정보 가져오기(소셜로그인) -->
+    <select id="getSocialUserInfo" parameterType="String" resultType="com.team3.camping.domain.UserInfoVo">
+        SELECT Email as userEmail
+              ,Name as userName
+              ,UserBirth
+              ,CASE
+                   WHEN Gender = 'm' THEN '남성'
+                   WHEN Gender = 'f' THEN '여성'
+               END "gender"
+              ,UserTelNum
+              
+              ,ZipCode
+              ,BaseAddr
+              ,DtlAddr
+              ,Auth_Vendor as platform
+        FROM   user_tbl
+        WHERE  Email = #{strUserKey}
+    </select>
+    
+    <!-- 유저 정보 수정 -->
+    <update id="userInfoUpdate" parameterType="com.team3.camping.domain.UserInfoVo">
+        UPDATE TUserInfo
+        SET   
+               <if test='userEmail != null and !userEmail.equals("")'>
+                   UserEmail = #{userEmail}
+               </if>
+               <if test='userEmail != null and userEmail.equals("")'>
+                   UserEmail = null
+               </if>
+               <if test='userPwd != null'>
+                  UserPwd = #{userPwd}
+               </if>
+               <if test='userName != null'>
+                  UserName = #{userName}
+               </if>
+               <if test='userBirth != null'>
+                  UserBirth = #{userBirth}
+               </if>
+               <if test='gender != null'>
+                  Gender = #{gender}
+               </if>
+               <if test='userTelNum != null'>
+                  UserTelNum = #{userTelNum}
+               </if>
+               <if test='zipCode != null'>
+                  zipCode  = #{zipCode}
+                 ,baseAddr = #{baseAddr}
+                 ,dtlAddr  = #{dtlAddr}
+               </if>
+
+        WHERE  UserId     = #{userId}
+    </update>
+    
+    <!-- 기존 패스워드 가져오기 -->
+    <select id="getPwd" parameterType="String" resultType="String">
+        SELECT UserPwd
+        FROM   TUserInfo
+        WHERE  UserId = #{strUserKey}
+    </select>
+    
+    <!-- 탈퇴 사유 리스트 가져오기 -->
+    <select id="getSecessionReasonList" resultType="com.team3.camping.domain.SecReasonVo">
+        SELECT SecReasonNo, SecReason
+        FROM   TSecessionReason
+    </select>
+    
+    <!-- 회원 탈퇴 -->
+    <insert id="userSecession" parameterType="com.team3.camping.domain.SecReasonVo">
+        INSERT INTO TUserHis(
+                             UserHisNo, UserIdOrEmail, UpdDate, StateCode, Reason,  SecReasonNo
+                             )
+                      VALUES(
+                             UserHisNo_SEQ.NEXTVAL, #{userId}, SYSDATE, '999', '탈퇴', #{secReasonNo}
+                             )
+    </insert>
+    
+    <!-- 회원 탈퇴 User_Tbl 상태코드 변경 -->
+    <insert id="SetUserTblStateCode" parameterType="com.team3.camping.domain.SecReasonVo">
+        UPDATE User_Tbl
+           SET StateCode = 999
+        WHERE  Email     = #{userId}
+    </insert>
+    
+    
+</mapper>

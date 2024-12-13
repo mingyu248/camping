@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminHelpMngMapper">
+	
+	<select id="getHelpList" resultType="com.team3.camping.domain.HelpVo" parameterType="map">
+		SELECT HelpNo, HelpTitle, UserIdOrEmail, RegDate, StateCode, rn
+		FROM (
+		      SELECT HelpNo,
+		             HelpTitle,
+		             UserIdOrEmail,
+		             RegDate,
+		             CASE
+		                 WHEN StateCode = 100 THEN '답변완료'
+		                 WHEN StateCode = 200 THEN '답변전'
+		             END AS StateCode,
+		             ROW_NUMBER() OVER (ORDER BY RegDate DESC) AS rn
+		      FROM THelp
+		      <where>
+	            <if test="helpTitle != null and helpTitle != ''">
+	                HelpTitle LIKE '%' || #{helpTitle} || '%'
+	            </if>
+	            
+	            <if test="userId != null and userId != ''">
+	                <if test="helpTitle != null and helpTitle != ''">AND</if>
+	                UserIdOrEmail LIKE '%' || #{userId} || '%'
+	            </if>
+	            
+	            <if test="startDate != null and startDate != ''">
+	                <if test="helpTitle != null or userId != null">AND</if>
+	                RegDate > #{startDate}
+	            </if>
+	            
+	            <if test="endDate != null and endDate != ''">
+	                <if test="helpTitle != null or userId != null or startDate != null">AND</if>
+	                <![CDATA[
+	                RegDate < #{endDate}
+	                ]]>
+	            </if>
+	            
+	            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+	                <if test="helpTitle != null or userId != null">AND</if>
+	                RegDate BETWEEN #{startDate} AND #{endDate}
+	            </if>
+	            <if test="stateCode != null and stateCode != ''">
+	                <if test="helpTitle != null or userId != null or startDate != null or endDate != null">AND</if>
+	                StateCode = #{stateCode}
+	            </if>
+	          </where>
+		)  
+		WHERE rn BETWEEN #{startRow} AND #{endRow}
+		ORDER BY rn
+	</select>
+	
+	<select id="getHelpTotalCount" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM   THelp
+		<where>
+          <if test="helpTitle != null and helpTitle != ''">
+              HelpTitle LIKE '%' || #{helpTitle} || '%'
+          </if>
+          <if test="userId != null and userId != ''">
+              <if test="helpTitle != null and helpTitle != ''">AND</if>
+              UserIdOrEmail LIKE '%' || #{userId} || '%'
+          </if>
+          <if test="startDate != null and startDate != ''">
+              <if test="helpTitle != null or userId != null">AND</if>
+              RegDate > #{startDate}
+          </if>
+          <if test="endDate != null and endDate != ''">
+              <if test="helpTitle != null or userId != null or startDate != null">AND</if>
+              <![CDATA[
+              RegDate < #{endDate}
+              ]]>
+          </if>
+          <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+              <if test="helpTitle != null or userId != null">AND</if>
+              RegDate BETWEEN #{startDate} AND #{endDate}
+          </if>
+          <if test="stateCode != null and stateCode != ''">
+              <if test="helpTitle != null or userId != null or startDate != null or endDate != null">AND</if>
+              StateCode = #{stateCode}
+          </if>
+        </where>
+	</select>
+	
+	<select id="getUserHelpDetail" resultType="com.team3.camping.domain.HelpVo" parameterType="int">
+		SELECT HelpNo
+		      ,UserIdOrEmail
+		      ,HelpTitle
+		      ,HelpDetail
+		      ,RegDate
+		      
+		      ,AdminId
+		      ,Answer
+		      ,AnswerDate
+		      ,CASE
+		      	   WHEN StateCode = 100 THEN '답변완료'
+		      	   WHEN StateCode = 200 THEN '답변전'
+		       END AS StateCode
+		FROM   THelp
+		WHERE  HelpNo = #{intHelpNo}
+	</select>
+	
+	<select id="getHelpCountByStatus" resultType="com.team3.camping.domain.HelpVo">
+		SELECT CASE
+		           WHEN StateCode = 100 THEN '답변완료'
+		           WHEN StateCode = 200 THEN '답변전'
+		       END      AS StateCode
+		      ,COUNT(*) AS Count
+		FROM   THelp
+		GROUP BY StateCode
+	</select>
+</mapper>

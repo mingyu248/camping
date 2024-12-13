@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.HelpMapper">
+
+    <!-- 시퀀스 -->
+    <select id="getSeqNo" resultType="int">
+        SELECT HelpNo_SEQ.NEXTVAL
+        FROM   dual
+    </select>
+	
+	<!-- 문의 등록 -->
+	<insert id="helpRegist" parameterType="com.team3.camping.domain.HelpVo">
+		INSERT INTO THelp( 
+	                      HelpNo, UserIdOrEmail, HelpTitle, HelpDetail
+                 		  )
+             	   VALUES(
+             		      #{helpNo}, #{userIdOrEmail}, #{helpTitle}, #{helpDetail}
+                          )
+	</insert>
+	
+	<!-- 문의 리스트 -->
+    <select id="getHelpList" resultType="com.team3.camping.domain.HelpVo" parameterType="map">
+        SELECT HelpNo, HelpTitle, UserIdOrEmail, RegDate, StateCode, rn as helpRowNo
+        FROM (
+              SELECT HelpNo,
+                     HelpTitle,
+                     UserIdOrEmail,
+                     RegDate,
+                     CASE
+                         WHEN StateCode = 100 THEN '답변완료'
+                         WHEN StateCode = 200 THEN '답변전'
+                     END AS StateCode,
+                     ROW_NUMBER() OVER (ORDER BY RegDate DESC) AS rn
+              FROM   THelp
+              WHERE  UserIdOrEmail = #{userKey}
+		             <if test="helpTitle != null and helpTitle != ''">
+		                 AND HelpTitle LIKE '%' || #{helpTitle} || '%'
+		             </if>
+		             <if test="stateCode != null and stateCode != ''">
+		                 AND StateCode = #{stateCode}
+		             </if>
+        )  
+        WHERE rn BETWEEN #{startRow} AND #{endRow}
+        ORDER BY rn
+    </select>
+    
+    <select id="getHelpTotalCount" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM   THelp
+        WHERE  UserIdOrEmail = #{userKey}
+               <if test="helpTitle != null and helpTitle != ''">
+                   AND HelpTitle LIKE '%' || #{helpTitle} || '%'
+               </if>
+               <if test="stateCode != null and stateCode != ''">
+                   AND StateCode = #{stateCode}
+               </if>
+    </select>
+
+	<!-- 문의 상세 -->
+    <select id="getHelp" parameterType="int" resultType="com.team3.camping.domain.HelpVo">
+        SELECT HelpNo
+              ,UserIdOrEmail
+              ,HelpTitle
+              ,HelpDetail
+              ,RegDate
+        
+              ,AdminId
+              ,Answer
+              ,AnswerDate
+              ,CASE
+                   WHEN StateCode = 100 THEN '답변완료'
+                   WHEN StateCode = 200 THEN '답변전'
+               END AS StateCode
+        FROM   THelp
+        WHERE  HelpNo = #{intHelpNo}
+    </select>
+    
+    <!-- 문의 작성자 가져오기 -->
+    <select id="getHelpUserId" parameterType="int" resultType="String">
+        SELECT UserIdOrEmail
+        FROM   THelp
+        WHERE  HelpNo = #{intHelpNo}
+    </select>
+    
+    <!-- 문의 상태코드 가져오기 -->
+    <select id="getStateCode" parameterType="int" resultType="String">
+        SELECT CASE
+                   WHEN StateCode = 100 THEN '답변완료'
+                   WHEN StateCode = 200 THEN '답변전'
+               END AS StateCode
+        FROM   THelp
+        WHERE  HelpNo = #{intHelpNo}
+    </select>
+    
+    <!-- 문의 삭제 -->
+    <delete id="helpDelete" parameterType="int">
+        DELETE THelp
+        WHERE  HelpNo = #{intHelpNo}
+    </delete>
+</mapper>

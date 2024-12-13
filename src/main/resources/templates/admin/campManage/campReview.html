@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/campManage/campManage.js}"></script>
+<title>캠핑장 위치</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="page_title" th:text="${campDetail.FacilityName}"></h2>
+    	<div class="wrapper">
+	        <div class="camp_info_menu">
+	            <ul class="camp_menu">
+	                <li th:onclick="|location.href='@{/admin/camp_detail(no=${campDetail.campNo})}'|">소개</li>
+	                <li th:onclick="|location.href='@{/admin/camp_location(no=${campDetail.campNo})}'|">위치</li>
+	                <li class="active" th:onclick="|location.href='@{/admin/camp_review(no=${campDetail.campNo})}'|">후기</li>
+	                <li th:onclick="|location.href='@{/admin/camp_reservation(no=${campDetail.campNo})}'|">예약 내역</li>
+	            </ul>
+	        </div>
+	    </div>
+	    <div class="contour">
+	    	<div class="separator"></div>
+	    </div>
+	    <input type="hidden" th:value=${campDetail.campNo} id="campNo">
+	    <div class="review_search">
+		    <div class="review_search_area">
+		    	<input type="text" id="reviewTitle" placeholder="제목" class="input-field">
+		    	<input type="text" id="userAccount" placeholder="아이디" class="input-field">
+		    	<input type="date" id="startDate" class="input-field">
+		    	<input type="date" id="endDate" class="input-field">
+		    	<select id="stateCode" class="select-field">
+			        <option value="">상태</option>
+			        <option value="100">정상</option>
+			        <option value="900">정지</option>
+			    </select>
+		    	<button onclick="searchReview()" class="search-button">검색</button>
+		    </div>
+	    </div>
+	    <div class="review_area">
+	    	<table class="review_data">
+	    		<thead>
+	    			<tr>
+	    				<td>번호</td>
+	    				<td>제목</td>
+	    				<td>작성자</td>
+	    				<td>조회수</td>
+	    				<td>등록일</td>
+	    				<td>상태</td>
+	    			</tr>
+	    		</thead>
+	    		<tbody>
+	    			<tr th:each="review:${reviewList}">
+	    				<td th:text="${review.reviewNo}"></td>
+	    				<td th:text="${review.reviewTitle}" class="a_title" th:onclick="'reviewDetail(\'' + ${review.reviewNo} + '\')'"></td>
+	    				<td th:text="${review.userIdOrEmail}"></td>
+	    				<td th:text="${review.views}"></td>
+	    				<td th:text="${#dates.format(review.regDate, 'yyyy년 MM월 dd일')}"></td>
+	    				<td th:text="${review.stateCode}" th:class="${(review.stateCode == '정상') ? 'status_normal' : 
+						                                              (review.stateCode == '정지') ? 'status_stopped' : ''}"></td>
+	    			</tr>
+	    		</tbody>
+	    	</table>
+	    </div>
+	    <div id="pagination" class="pagination">
+		    <span th:if="${pagination.currentPage > 1}" class="page-item">
+		        <a th:href="@{/admin/camp_review(no=${campNo}, page=${pagination.currentPage - 1}, limit=${pagination.limit}, title=${reviewTitle}, id=${userAccount}, start_date=${startDate}, end_date=${endDate}, status=${stateCode})}" class="page-link">이전</a>
+		    </span>
+		
+		    <span th:each="page : ${pagination.pageRange}" class="page-item" th:classappend="${page == pagination.currentPage} ? 'active'">
+		        <a th:href="@{/admin/camp_review(no=${campNo}, page=${page}, limit=${pagination.limit}, title=${reviewTitle}, id=${userAccount}, start_date=${startDate}, end_date=${endDate}, status=${stateCode})}" th:text="${page}" class="page-link"></a>
+		    </span>
+		
+		    <span th:if="${pagination.currentPage < pagination.totalPages}" class="page-item">
+		        <a th:href="@{/admin/camp_review(no=${campNo}, page=${pagination.currentPage + 1}, limit=${pagination.limit}, title=${reviewTitle}, id=${userAccount}, start_date=${startDate}, end_date=${endDate}, status=${stateCode})}" class="page-link">다음</a>
+		    </span>
+		</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+<style>
+	th:nth-child(1), td:nth-child(1) { width: 60px; }
+	th:nth-child(2), td:nth-child(2) { width: 200px; }
+	th:nth-child(3), td:nth-child(3) { width: 60px; }
+	th:nth-child(4), td:nth-child(4) { width: 20px; }
+	th:nth-child(5), td:nth-child(5) { width: 100px; }
+	th:nth-child(6), td:nth-child(6) { width: 20px; }
+</style>
+</html>

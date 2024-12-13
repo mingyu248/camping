@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.adminMapper.AdminCampMngMapper">
+	
+	<select id="getCampInfoList" resultType="com.team3.camping.domain.CampInfoVo" parameterType="map">
+	    SELECT CampNo, BusinessEntity, FacilityName, ProvinceName, City_Gun_GuName
+	          ,LastUpdatedDate, StateCode
+	    FROM   (
+	            SELECT CampNo 
+	                  ,BusinessEntity
+	                  ,FacilityName
+	                  ,ProvinceName
+	                  ,City_Gun_GuName
+	                  
+	                  ,LastUpdatedDate
+	                  ,CASE
+	                       WHEN StateCode = 100 THEN '정상'
+	                       WHEN StateCode = 900 THEN '비활성화'
+	                   END AS StateCode
+	                  ,ROW_NUMBER() OVER (ORDER BY CampNo) AS rn
+	            FROM TCampInfo
+		        <where>
+	            	<if test="facilityName != null and facilityName != ''">
+		                FacilityName LIKE '%' || #{facilityName} || '%'
+		            </if>
+		            <if test="businessEntity != null and businessEntity != ''">
+		                <if test="facilityName != null and facilityName != ''">AND</if>
+		                	BusinessEntity = #{businessEntity}
+		            </if>
+		            <if test="provinceName != null and provinceName != ''">
+		                <if test="facilityName != null or businessEntity != null">AND</if>
+		                	ProvinceName = #{provinceName}       
+		            </if>
+		            <if test="cityGunGuName != null and cityGunGuName != ''">
+		                <if test="facilityName != null or businessEntity != null or provinceName != null">AND</if>
+		                	City_Gun_GuName = #{cityGunGuName}       
+		            </if>
+		            <if test="startDate != null and startDate != ''">
+		                <if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null">AND</if>
+		                	LastUpdatedDate > #{startDate}       
+		            </if>
+		            <if test="endDate != null and endDate != ''">
+		                <if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null or startDate != null">AND</if>
+			                <![CDATA[
+			                LastUpdatedDate < #{endDate}
+			                ]]>
+		            </if>
+		            <if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+		                <if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null">AND</if>
+		                	LastUpdatedDate BETWEEN #{startDate} AND #{endDate}
+		            </if>
+		            <if test="stateCode != null and stateCode != ''">
+		                <if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null or startDate != null or endDate != null">AND</if>
+		                	StateCode = #{stateCode}
+		            </if>
+		        </where>
+	    		)
+	    WHERE   rn BETWEEN #{startRow} AND #{endRow}
+	    ORDER BY rn
+	</select>
+		
+	
+	<select id="getCampTotalCount" resultType="int" parameterType="map">
+		SELECT COUNT(*)
+		FROM   TCampInfo
+		<where>
+			<if test="facilityName != null and facilityName != ''">
+				FacilityName LIKE '%' || #{facilityName} || '%'
+			</if>
+			<if test="businessEntity != null and businessEntity != ''">
+				<if test="facilityName != null and facilityName != ''">AND</if>
+					BusinessEntity = #{businessEntity}
+			</if>
+			<if test="provinceName != null and provinceName != ''">
+				<if test="facilityName != null or businessEntity != null">AND</if>
+					ProvinceName = #{provinceName}       
+				</if>
+			<if test="cityGunGuName != null and cityGunGuName != ''">
+				<if test="facilityName != null or businessEntity != null or provinceName != null">AND</if>
+					City_Gun_GuName = #{cityGunGuName}       
+			</if>
+			<if test="startDate != null and startDate != ''">
+				<if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null">AND</if>
+	               LastUpdatedDate > #{startDate}       
+			</if>
+			<if test="endDate != null and endDate != ''">
+				<if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null or startDate != null">AND</if>
+	               <![CDATA[
+	               LastUpdatedDate < #{endDate}
+	               ]]>
+			</if>
+			<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+				<if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null">AND</if>
+					LastUpdatedDate BETWEEN #{startDate} AND #{endDate}
+				</if>
+			<if test="stateCode != null and stateCode != ''">
+				<if test="facilityName != null or businessEntity != null or provinceName != null or cityGunGuName != null or startDate != null or endDate != null">AND</if>
+	               StateCode = #{stateCode}
+			</if>
+		</where>
+	</select>
+	
+	<select id="groupByProvinceName" resultType="com.team3.camping.domain.CampInfoVo">
+		SELECT ProvinceName
+		FROM   TCampInfo
+		GROUP BY ProvinceName
+		ORDER BY ProvinceName ASC
+	</select>
+	
+	<select id="groupByCityGunGuName" resultType="com.team3.camping.domain.CampInfoVo">
+		SELECT City_Gun_GuName
+		FROM   TCampInfo
+		WHERE  ProvinceName = #{strProvinceName}
+		GROUP BY City_Gun_GuName
+		ORDER BY City_Gun_GuName ASC
+	</select>
+	
+	<select id="groupByBusinessEntity" resultType="com.team3.camping.domain.CampInfoVo">
+		SELECT BusinessEntity
+		FROM   TCampInfo
+		GROUP BY BusinessEntity
+		ORDER BY BusinessEntity ASC
+	</select>
+	
+	<select id="getCampInfoDetail" resultType="com.team3.camping.domain.CampInfoVo" parameterType="int">
+		 SELECT CampNo
+		       ,BusinessEntity
+		       ,CampingType
+		       ,FacilityName
+		       ,RoadAddress
+		      
+		       ,LandAddress
+		       ,TelNumber
+		       ,Website
+		       ,FacilityFeatures
+		       ,FacilityIntroduction
+		      
+		       ,LastUpdatedDate
+		       ,Latitude
+		       ,Longitude
+		       ,Electricity_Subfacility
+		       ,HotWater_Subfacility
+		       
+		       ,WirelessInternet_Subfacility
+		       ,FirewoodSales_Subfacility
+		       ,WalkingTrail_Subfacility
+		       ,WaterPlayArea_Subfacility
+		       ,Playground_Subfacility
+		       
+		       ,Mart_Subfacility
+		       ,CASE
+		            WHEN StateCode = 100 THEN '정상'
+		            WHEN StateCode = 900 THEN '비활성화'
+		        END AS StateCode
+ 		 FROM   TCampInfo
+ 		 WHERE  CampNo = #{intCampNo}
+	</select>
+	
+	<select id="getCampDetailImage" resultType="com.team3.camping.domain.CampInfoVo" parameterType="int">
+		SELECT ImagePath
+		FROM   TCampImg
+		WHERE  CampNo = #{intCampNo}
+		AND    ROWNUM = 1
+	</select>
+	
+	<select id="getCampDetailImageList" resultType="com.team3.camping.domain.CampInfoVo" parameterType="int">
+		SELECT ImagePath
+		FROM (
+		      SELECT ImagePath
+		            ,ROW_NUMBER() OVER (
+		                                ORDER BY ImagePath DESC
+		                                ) AS rn
+		      FROM TCampImg
+		      WHERE CampNo = #{intCampNo}
+		) 
+		WHERE rn BETWEEN 2 AND 3
+	</select>
+	
+	<select id="getCampCountByStatus" resultType="com.team3.camping.domain.CampInfoVo">
+		SELECT CASE
+		           WHEN StateCode = 100 THEN '정상'
+		           WHEN StateCode = 900 THEN '비활성화'
+		       END AS StateCode
+		      ,COUNT(*) Count
+		FROM   TCampInfo
+		GROUP BY StateCode
+	</select>
+	
+	<insert id="registCampInfo" parameterType="com.team3.camping.domain.CampInfoVo">
+		INSERT INTO TCampInfo(
+		                      CampNo,                     FacilityName,                 CampingType,               ProvinceName,                City_Gun_GuName
+		                     ,Legaltown_Village_DongName, RiName,                       LotNumber,                 RoadName,                    BuildingNumber
+		                     ,Latitude,                   Longitude,                    PostalCode,                RoadAddress,                 LandAddress
+		                     ,TelNumber,                  WebSite,                      BusinessEnity,             WeekdayOperation,            WeekendyOperation
+		                     ,SpringOperation,            SummerOperation,              AutumnOperation,           WinterOperation,             Electricity_SubFacility
+		                     
+		                     ,HotWater_SubFacility,       WirelessInternet_SubFacility, FirewoodSales_SubFacility, WalkingPlayArea_SubFacility, WaterPlayArea_Subfacility
+		                     ,PlayGround_SubFacility,     Mart_SubFacility,             FacilityFeatures,          FacilityIntroduction,        LastUpdateDate
+		                     ,StateCode, UpdDate
+		                      )
+		               VALUES(
+		                      CampNo_SEQ.NEXTVAL,          #{facilityName},                #{campingType},              #{provinceName},            #{cityGunGuName}
+		                     ,#{legalTownVillageDongName}, #{riName},                      #{lotNumber},                #{roadName},                #{buildingNumber}
+		                     ,#{latitude},                 #{longitude},                   #{postalCode},               #{roadAddress},             #{landAddress}
+		                     ,#{telNumber},                #{website},                     #{businessEntity},           #{weekdayOperation},        #{weekendOperation}
+		                     ,#{springOperation},          #{summerOperation},             #{autumnOperation},          #{winterOperation},         #{electricitySubfacility}
+		                     
+		                     ,#{hotWaterSubfacility},      #{wirelessInternetSubfacility}, #{firewoodSalesSubfacility}, #{walkingTrailSubfacility}, #{waterPlayAreaSubfacility}
+		                     ,#{playgroundSubfacility},    #{martSubfacility},             #{facilityFeatures},         #{facilityIntroduction},    #{lastUpdatedDate}
+		                     ,100, NULL
+		                      )
+	</insert>
+	
+	<select id="getReservationListByCamp" resultType="com.team3.camping.domain.ReservationVo" parameterType="map">
+		SELECT ReservationNo, UserIdOrEmail, CheckInDate, CheckOutDate, RegDate
+		      ,StateCode
+		FROM  (
+		       SELECT ReservationNo
+		             ,UserIdOrEmail
+		             ,CheckInDate
+		             ,CheckOutDate
+		             ,RegDate
+		          
+		             ,CASE
+		                  WHEN StateCode = 100 THEN '정상'
+		                  WHEN StateCode = 900 THEN '보류'
+		              END AS StateCode
+		             ,ROW_NUMBER() OVER (
+		                                 ORDER BY RegDate DESC
+		                                 ) AS rn
+		       FROM   TCampReservation
+		       WHERE  CampNo = #{campNo}
+		       )
+		WHERE rn BETWEEN #{startRow} AND #{endRow}
+		ORDER BY rn
+	</select>
+	
+	<select id="getReservationTotalCountByCamp" resultType="int" parameterType="int">
+		SELECT COUNT(*)
+		FROM   TCampReservation
+		WHERE  CampNo = #{intCampNo}
+	</select>
+</mapper>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.userMapper.SuggestionMapper">
+
+    <!-- 추천 중복 체크 -->    
+    <select id="suggestionCheck" parameterType="com.team3.camping.domain.SuggestionVo" resultType="int">
+        SELECT COUNT(*)
+        FROM   TCampSuggestion
+        WHERE  UserIdOrEmail = #{userKey}
+          AND  CampNo        = #{campNo}
+    </select>
+    
+    <insert id="addSuggestion" parameterType="com.team3.camping.domain.SuggestionVo">
+        INSERT INTO TCampSuggestion(
+	                                UserIdOrEmail, CampNo
+	                                )
+	                         VALUES( 
+	                                #{userKey}, #{campNo}
+	                                )
+    </insert>
+    
+    <delete id="suggestionDelete" parameterType="com.team3.camping.domain.SuggestionVo">
+        DELETE TCampSuggestion
+        WHERE  UserIdOrEmail = #{userKey}
+          AND  CampNo        = #{campNo}
+    </delete>
+</mapper>

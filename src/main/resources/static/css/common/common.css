@@ -1,0 +1,445 @@
+/* 레이아웃 틀 */
+html {
+    height: 100%;
+    background: #062038;
+}
+
+body {
+    margin: 0;
+    height: 100%;
+    background: #062038;
+    /* background: #020B13; */
+    font-family: Dotum,'돋움',Helvetica,sans-serif;
+}
+#logo {
+    width: 240px;
+    height: 44px;
+    cursor: pointer;
+}
+
+#header {
+    background: #062038;
+    padding-top: 62px;
+    padding-bottom: 20px;
+    text-align: center;
+}
+#wrapper {
+    background: #062038;
+    position: relative;
+    height: 100%;
+}
+
+#content {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    width: 460px;
+}
+
+/* 입력폼 */
+
+input:focus {
+    outline: none;
+}
+
+
+h3 {
+    margin: 19px 0 8px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.box {
+    display: block;
+    width: 100%;
+    height: 51px;
+    border: none;
+
+    border-bottom: solid 2px #dadada;
+    padding: 10px 14px 10px 14px;
+    box-sizing: border-box;
+    background: #062038;
+    position: relative;
+}
+
+.int {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 29px;
+    border: none;
+    background: #062038;
+    color: #ffffff;
+    font-weight: 900;
+    font-size: 17px;
+}
+
+input {
+    font-family: Dotum,'돋움',Helvetica,sans-serif;    
+}
+
+.box.int_id {
+    padding-right: 110px;
+}
+
+.box.int_pass {
+    padding-right: 40px;
+}
+
+.box.int_pass_check {
+    padding-right: 40px;
+}
+
+.step_url {
+    /*@naver.com*/
+    position: absolute;
+    top: 16px;
+    right: 13px;
+    font-size: 15px;
+    color: #8e8e8e;
+}
+
+.pswdImg {
+    width: 18px;
+    height: 20px;
+    display: inline-block;
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    margin-top: -10px;
+    cursor: pointer;
+}
+
+#bir_wrap {
+    display: table;
+    width: 100%;
+}
+
+/* #zip_area {
+    display: table-cell;
+    width: 294px;
+} */
+#zip_area {
+    display: flex;
+    align-items: center; /* 수직 정렬 */
+}
+
+.box.zipCode {
+    flex: 1; /* 입력란이 가능한 공간을 차지하도록 설정 */
+}
+#bir_mm, #bir_dd {
+    padding-left: 10px;
+}
+
+select {
+    width: 100%;
+    height: 29px;
+    font-size: 15px;
+    background: #fff url(https://static.nid.naver.com/images/join/pc/sel_arr_2x.gif) 100% 50% no-repeat;
+    background-size: 20px 8px;
+    -webkit-appearance: none;
+    display: inline-block;
+    text-align: start;
+    border: none;
+    cursor: default;
+    font-family: Dotum,'돋움',Helvetica,sans-serif;
+}
+
+/* 에러메세지 */
+
+.error_next_box {
+    margin-top: 9px;
+    font-size: 12px;
+    color: red;
+    display: none;
+}
+
+#alertTxt {
+    position: absolute;
+    top: 19px;
+    right: 38px;
+    font-size: 12px;
+    color: red;
+    display: none;
+}
+
+
+
+/* 버튼 */
+
+.btn_area {
+    margin: 30px 0 60px;
+}
+
+.btn_area_social {
+    margin: 10px 0 10px;
+    display: flex;
+    justify-content: center; 
+}
+.btn_content img {
+    margin-right: 10px; /* 이미지와 텍스트 사이의 간격 */
+}
+#btnJoin, #btnLogin {
+    margin-bottom: 10px;
+    width: 100%;
+    height: 58px;
+    /* padding: 21px 0 17px; */
+    /* border-color: rgb(0, 0, 168); */
+    border-radius: 5px;
+    border: 0;
+    cursor: pointer;
+    color: #BDBDBD;
+    background-color: #020B13;
+    font-size: 20px;
+    font-weight: 900;
+    font-style: normal;
+    /* font-family: Dotum,'돋움',Helvetica,sans-serif; */
+}
+
+#btnLogin_naver, #btnLogin_google {
+    width: 100%;
+    height: 55px;
+    /* padding: 21px 0 17px; */
+    cursor: pointer;
+    color: #062038;
+    background-color: white;
+    border-radius: 5px;
+    border-width: thin;
+    border-color: #333333;
+    font-size: 18px;
+    /* font-weight: bold; */
+    font-style: normal;
+    /* font-family: Dotum,'돋움',Helvetica,sans-serif; */
+}
+
+#btn_zip {
+    width: 120px;
+    height: 51px;
+    border: 2;
+    border-color: #ffffff;
+    cursor: pointer;
+    color: #BDBDBD;
+    background-color: black;
+    font-size: 16px;
+    font-weight: bold;
+    font-style: normal;
+    /* font-family: Dotum,'돋움',Helvetica,sans-serif; */
+}
+
+/* header */
+/* ======================================= */
+header {
+    padding: 20px;
+    border-bottom: 2px solid #ddd;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-nav {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+}
+
+.header-nav li {
+    margin: 0 15px;
+}
+
+.header-nav a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.header-nav a:hover {
+    text-decoration: underline;
+}
+
+.header-nav a.active {
+    font-weight: bold;
+}
+/* ======================================= */
+/* footer */
+/* ======================================= */
+footer {
+    background-color: #f8f9fa;
+    padding: 10px 0;
+    text-align: center;
+    border-top: 1px solid #dee2e6;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.footer-links {
+    margin-top: 10px;
+}
+
+.footer-links a {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007bff;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+/* ======================================= */
+/* ======================================= */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    color: #555; /* 기본 글씨 색상 진한 회색 */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* 뷰포트 높이의 100% */
+    min-width: 1340px;
+}
+
+.container {
+    max-width: 1300px; /* 고정된 너비 */
+    min-width: 1300px; /* 고정된 너비 */
+    margin: 0 auto;    /* 가운데 정렬 */
+    padding: 20px;     /* 내부 여백 */
+    padding-top: 50px;
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    flex: 1;           /* 나머지 공간을 채움 */
+}
+h2 {
+    text-align: center;
+    margin: 30px;
+}
+h4 {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+
+.other_menu1 {
+    margin-top: 20px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+    justify-content: flex-start;
+}
+.other_menu {
+    width: 32%;
+    height: 130px;
+    border: 1px solid #222;
+    /* border-radius: 5px; */
+    display: flex;
+    position: relative;
+    justify-content: center;
+    margin: 1%;
+    margin-right: -0.5%;
+    margin-bottom: -0.5%;
+    color: #222;
+    box-sizing: border-box;
+    text-decoration: none;
+    transition: 0.3s;
+}
+.other_menu div:nth-child(1) {
+    position: absolute;
+    font-weight: bold;
+    color: black;
+    top: 30%;
+}
+.other_menu div:nth-child(2) {
+    position: absolute;
+    top: 50%;
+}
+.other_menu:hover {
+    background-color: #22222222;
+}
+
+
+.success_total {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    height: 200px;
+}
+.success_total div {
+    height: 33.33333%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 50px;
+    border-bottom: 1px solid #2222222d;
+    box-sizing: border-box;
+}
+/*=====================================================*/
+/*=====================회원가입 버튼=======================*/
+/*=====================================================*/
+ .registerok button:first-child {
+    background-color: black; /* 검은색 배경 */
+    color: white;            /* 흰색 글씨 */
+    border: 1px solid white; /* 흰색 테두리 */
+}
+
+.registerok button:first-child:hover {
+    background-color: white; /* 호버 시 배경색 흰색 */
+    color: black;            /* 호버 시 글씨색 검은색 */
+    border: 1px solid black; /* 호버 시 테두리 검은색 */
+}
+.registerok {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.registerok button {
+    background-color: #fff;
+    color: black;
+    border: 1px solid black;
+    width: 200px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.text_join {
+    color: #ffffff;
+    text-decoration-line : none;
+}
+
+.logo_google {
+    width: 30px;
+    height: 30px;
+}
+
+.logo_naver {
+    width: 30px;
+    height: 30px;
+}
+
+.btn_content {
+    display: flex;
+    align-items: center; /* 수직 중앙 정렬 */
+}
+
+.btn_content img {
+    margin-right: 10px; /* 이미지와 텍스트 사이의 간격 */
+}
+
+label {
+	color: #BDBDBD;
+}
+
+.sel {
+	color: #BDBDBD;
+	background-color: #062038;
+	border: none;
+	font-weight: bold;
+}

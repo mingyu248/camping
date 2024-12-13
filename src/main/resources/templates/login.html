@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+    <head>
+        <meta charset="UTF-8">
+        <title>로그인</title>
+        <link rel="stylesheet" th:href="@{/css/common/common.css}">
+        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    </head>
+    <body>
+        <!-- header -->
+        <div id="header">
+            <h1 title="메인 화면으로 이동" onclick="location.href='/camping/main'">LOGO</h1>
+        </div>
+
+        <!-- wrapper -->
+        <div id="wrapper">
+
+            <!-- content-->
+            <div id="content">
+				<form action="/camping/login" method="post">
+	                <!-- ID -->
+	                <div>
+	                    <span class="box int_id">
+	                        <input type="text" id="userId" class="int" maxlength="15" placeholder="아이디" name="userId" autocomplete="username" required>
+	                    </span>
+	                    <span class="error_next_box"></span>
+	                </div>
+	                <br>
+	                <!-- PASSWORD -->
+	                <div>
+	                    <span class="box int_pass">
+	                        <input type="password" id="userPwd" class="int" maxlength="20" name="userPwd" placeholder="비밀번호" autocomplete="current-password" required>
+	                        <!-- <img src="m_icon_pass.png" id="pswd1_img1" class="pswdImg"> -->
+	                    </span>
+	                    <span class="error_next_box"></span>
+	                </div>
+	
+	                
+	                <!-- LOGIN BTN-->
+	                <div class="btn_area">
+	                    <button type="submit" id="btnLogin">
+	                        <span>로 그 인</span>
+	                    </button>
+                		<a class="text_join" href="/camping/join">회원가입</a>
+	                </div>
+                </form>
+                
+                <div class="btn_area_social">
+                    <button id="btnLogin_naver" th:onclick="|window.location.href='@{/oauth2/authorization/google}'|">
+                        <span class="btn_content">
+                            <img class="logo_google" th:src="@{/images/login/google_logo.png}">Google 계정으로 로그인
+                        </span>
+                    </button>
+                </div>
+                <div class="btn_area_social">
+                    <button id="btnLogin_google" th:onclick="|window.location.href='@{/oauth2/authorization/naver}'|">
+                        <span class="btn_content">
+                            <img class="logo_naver" th:src="@{/images/login/naver_logo.png}">Naver 계정으로 로그인
+                        </span>
+                    </button>
+                </div>
+                
+            </div> 
+            <!-- content-->
+        </div> 
+        <!-- wrapper -->
+    <!-- <script src="main.js"></script> -->
+    </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/common/main.css}">
+    <link rel="stylesheet" th:href="@{/css/user/userStyle.css}">
+    <script th:src="@{/js/user/userSecession.js}"></script>
+
+    <title>내 정보</title>
+</head>
+<body>
+    
+    <header id="header">
+        <h1><a href="/camping/main">LOGO<span></span></a></h1>
+        <a href="#menu">메뉴</a>
+    </header>
+    <nav id="menu">
+        <ul class="links">
+            
+            <li>
+                <a th:text="${userId == null ? '로그인' : userId + '님 환영합니다.'}" th:href="${userId == null ? '/camping/account' : '/camping/user/my_info'}"></a>
+            </li>
+            <li><a href="/camping/main">홈</a></li>
+            <li><a href="/camping/user/camp_list">캠핑장</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/my_info">마이페이지</a></li>
+            <li><a th:if="${userId != null}" href="/camping/user/help_regist">문의하기</a></li>
+            <li>
+                <a th:text="${userId == null ? '회원가입' : '로그아웃'}" th:href="${userId == null ? '/camping/join' : '/camping/logout'}"></a>
+            </li>
+        </ul>
+    </nav>
+    
+    <div class="banner-container">
+        <div>
+            <p class="banner-text">마이페이지</p>
+        </div>
+        <div class="category-div">
+            <ul class="category-ul">
+                <li class="category-li li-active"><a href="/camping/user/my_info" class="text-active">회원 정보</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_cart">찜</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_review">내 후기</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_help">문의</a></li>
+                <li class="category-li li-no-active"><a href="/camping/user/my_reservation">예약 내역</a></li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="wrapper style1">
+        <div class="user-info-div">
+            <h3>계정 정보</h3>
+        </div>
+        <div class="inner">
+            <div class="user-info-div">
+                <div>
+                    <p>로그인 정보</p>
+                    <ul>
+                    <!-- <p th:text="${userInfo.platform}" class="right-align"> -->
+                        <li th:if="${loginState == 2}"><p>플랫폼</p>
+                            <div class="logo-img-con">
+                                <img class="logo-img" th:src="${userInfo.platform == 'google' ? '/camping/images/login/google_logo.png' : userInfo.platform == 'naver' ? '/camping/images/login/naver_logo.png' : ''}">
+                            </div>
+                        </li>
+                        <li th:if="${loginState == 1}"><p>아이디</p><p th:text="${userInfo.userId}" class="right-align"></p></li>
+                        <li th:if="${loginState == 1}" class="mouse-over pointer" th:onclick="window.location.href='/camping/user/email_update?user_email=' + [[${userInfo.userEmail}]]"><p>이메일</p><p th:text="${userInfo.userEmail}" class="right-align"></p></li>
+                        <li th:if="${loginState == 2}"><p>이메일</p><p th:text="${userInfo.userEmail}" class="right-align"></p></li>
+                        <li th:if="${loginState == 1}" class="mouse-over pointer" th:onclick="location.href='/camping/user/password_update'"><p>비밀번호 변경</p><p></p></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <p>프로필 정보</p>
+                    <ul>
+                        <li th:if="${loginState == 1}" class="mouse-over pointer" th:onclick="window.location.href='/camping/user/name_update?user_name=' + [[${userInfo.userName}]]"><p>이름</p><p th:text="${userInfo.userName}" class="right-align"></p></li>
+                        <li th:if="${loginState == 2}"><p>이름</p><p th:text="${userInfo.userName}" class="right-align"></p></li>
+                        <li class="mouse-over pointer" th:onclick="window.location.href='/camping/user/birth_update?user_birth=' + [[${userInfo.userBirth}]]"><p>생년월일</p><p th:text="${userInfo.userBirth}" class="right-align"></p></li>
+                        <li class="mouse-over pointer" th:onclick="window.location.href='/camping/user/gender_update?gender=' + [[${userInfo.gender}]]"><p>성별</p><p th:text="${userInfo.gender}" class="right-align"></p></li>
+                        <li class="mouse-over pointer" th:onclick="window.location.href='/camping/user/tel_update?user_tel_num=' + [[${userInfo.userTelNum}]]"><p>전화번호</p><p th:text="${userInfo.userTelNum}" class="right-align"></p></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <p>주소</p>
+                    <ul class="mouse-over pointer" th:onclick="window.location.href='/camping/user/address_update?zip_code=' + [[${userInfo.zipCode}]] + '&base_addr=' + [[${userInfo.baseAddr}]] + '&dtl_addr=' + [[${userInfo.dtlAddr}]]">
+                        <li><p>우편번호</p><p th:text="${userInfo.zipCode}" class="right-align"></p></li>
+                        <li><p>기본주소</p><p th:text="${userInfo.baseAddr}" class="right-align"></p></li>
+                        <li><p>상세주소</p><p th:text="${userInfo.dtlAddr}" class="right-align"></p></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="user-secession-div">
+                <a class="secession pointer" onclick="openPopup()">회원 탈퇴</a>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer">
+        <div class="inner">
+            <div class="flex flex-3">
+                <div class="col">
+                    <h3>고객센터</h3>
+                    <ul class="alt">
+                        <li><a href="#">공지사항</a></li>
+                        <li><a href="/camping/user/help_regist">문의하기</a></li>
+                        <li><a href="#">개인정보처리방침</a></li>
+                        <li><a href="#">서비스이용약관</a></li>
+                        <li><a href="#">운영정책</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <div class="copyright">
+        &copy; 2024 Templated.co & Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+        Made with: <a href="https://templated.co/">Templated.co</a>
+    </div>
+    <script th:src="@{/js/common/index/jquery.min.js}"></script>
+    <script th:src="@{/js/common/index/jquery.scrolly.min.js}"></script>
+    <script th:src="@{/js/common/index/skel.min.js}"></script>
+    <script th:src="@{/js/common/index/util.js}"></script>
+    <script th:src="@{/js/common/index/main.js}"></script>
+</body>
+</html>

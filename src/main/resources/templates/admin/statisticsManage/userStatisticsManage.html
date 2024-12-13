@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/common/adminCommon.css}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<title>회원 현황(자체 서비스)</title>
+</head>
+<body>
+	<header id="header">
+		<h1><a href="/camping/main">LOGO<span></span></a></h1>
+	
+		<ul class="links">
+			<li><a href="/camping/main">통계</a></li>
+			<li><a href="/camping/admin/admin_manage">관리자 관리</a></li>
+			<li><a href="/camping/admin/user_manage">회원 관리</a></li>
+			<li><a href="/camping/admin/camp_manage">캠핑장 관리</a></li>
+			<li><a href="/camping/admin/reservation_manage">예약 관리</a></li>
+			<li><a href="/camping/admin/help_manage">문의</a></li>
+		</ul>
+        <ul>
+            <li>
+				<a th:text="${adminId == null ? '로그인' : adminId + '님 환영합니다.'}"></a>
+			</li>
+			<li>
+				<a th:text="${adminId == null ? '회원가입' : '로그아웃'}" th:href="${adminId == null ? '/camping/join' : '/camping/logout'}"></a>
+			</li>
+        </ul>
+    </header>
+    <div id="container">
+    	<h2 class="user_title">회원 현황(자체 서비스)</h2>
+        <div id="sub-category">
+		    <ul class="sub-links">
+		        <li><a href="/camping/main">최근 30일간 현황</a></li>
+		        <li><a href="/camping/admin/user_statistics">회원 현황(자체 서비스)</a></li>
+		        <li><a href="/camping/admin/social_statistics">회원 현황(소셜 로그인)</a></li>
+		        <li><a href="/camping/admin/camp_statistics">캠핑장 현황</a></li>
+		        <li><a href="/camping/admin/reservation_statistics">예약 현황</a></li>
+		        <li><a href="/camping/admin/help_statistics">문의 현황</a></li>
+		    </ul>
+		</div>
+		<div class="row">
+			<div class="column">
+				<h3 class="chartTitle">남녀 성비</h3>
+				<div class="chart-container">
+			    	<canvas id="genderChart"></canvas>
+				</div>
+			</div>
+			<div class="column">
+				<h3 class="chartTitle">연령대 별 현황</h3>
+				<div class="chart-container">
+				    <canvas id="ageGroupChart"></canvas>
+				</div>
+			</div>
+			<div class="column">
+				<h3 class="chartTitle">상태 별 현황</h3>
+				<div class="chart-container">
+				    <canvas id="statusChart"></canvas>
+				</div>
+			</div>
+		</div>
+    </div>
+    <footer id="footer">
+        <div class="copyright">
+            &copy; 2024 Team3. All rights reserved. Icons by <a href="https://icons8.com">Icons8</a><br>
+            Made with: <a href="#">Team3</a>
+        </div>
+    </footer>
+</body>
+<script th:inline="javascript">
+	document.addEventListener('DOMContentLoaded', function() {
+		
+		const genderStatistics   = /*[[${genderStatistics}]]*/ [];   // 남녀 성비
+		const ageGroupStatistics = /*[[${ageGroupStatistics}]]*/ []; // 연령대 별 현황
+		const statusStatistics   = /*[[${statusStatistics}]]*/ [];   // 상태 별 현황
+		
+		const genderLabels = genderStatistics.map(item => item.gender);
+		const genderData   = genderStatistics.map(item => item.count);
+		
+		const genderChart = new Chart(document.getElementById('genderChart').getContext('2d'), {
+			type: 'pie',
+			data: {
+				labels: genderLabels,
+				datasets: [{
+					label: '회원 수',
+					data: genderData,
+					backgroundColor: ['#36A2EB', '#FF6384'],
+				}]
+			},
+			options: {
+	            responsive: false,
+	            plugins: {
+	                legend: {
+	                    position: 'top',
+	                },
+	            }
+	        }
+		});
+		
+		const ageGroupLabels = ageGroupStatistics.map(item => item.ageGroup);
+		const ageGroupData   = ageGroupStatistics.map(item => item.count);
+		
+		const ageGroupChart = new Chart(document.getElementById('ageGroupChart').getContext('2d'), {
+			type: 'pie',
+			data: {
+				labels: ageGroupLabels,
+				datasets: [{
+					label: '회원 수',
+					data: ageGroupData,
+					backgroundColor: [
+						'#FF7F50', // 코랄
+					    '#4682B4', // 스틸 블루
+					    '#3CB371', // 미모사
+					    '#FFD700', // 골드
+					    '#FF69B4', // 핫핑크
+					    '#20B2AA'  // 라이트시안
+					],
+				}]
+			},
+			options: {
+	            responsive: false,
+	            plugins: {
+	                legend: {
+	                    position: 'top',
+	                },
+	            }
+	        }
+		});
+		
+		const statusLabels = statusStatistics.map(item => item.stateCode);
+		const statusData   = statusStatistics.map(item => item.count);
+		
+		const statusChart = new Chart(document.getElementById('statusChart').getContext('2d'), {
+			type: 'pie',
+			data: {
+				labels: statusLabels,
+				datasets: [{
+					label: '회원 수',
+					data: statusData,
+					backgroundColor: [
+						'#2375fa', '#fc3a3a', '#23610f'
+					],
+				}]
+			},
+			options: {
+	            responsive: false,
+	            plugins: {
+	                legend: {
+	                    position: 'top',
+	                },
+	            }
+	        }
+		});
+	});
+</script>
+</html>

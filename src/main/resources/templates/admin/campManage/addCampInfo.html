@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+	            xmlns:sec="http://www.thymeleaf.org/extras/spring-security6">
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" th:href="@{/css/admin/addCampInfo.css}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/admin/campManage/addCampInfo.js}"></script>
+<title>캠핑장 데이터 추가</title>
+</head>
+<body>
+    <div class="file-input-container">
+        <input type="text" id="fileName" class="file-input" placeholder="선택된 파일 없음" readonly>
+        <label class="custom-file-input" for="fileInput">파일 선택</label>
+        <input type="file" id="fileInput" accept=".csv, .xls" onchange="updateFileName()">
+    </div>
+    <button class="register-button" onclick="registCampInfo()">캠핑장 데이터 등록</button>
+</body>
+</html>

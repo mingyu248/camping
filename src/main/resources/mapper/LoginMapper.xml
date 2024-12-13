@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mapper.LoginMapper">
+
+    <!-- 아이디 -->
+	<select id="loadUserByUsername" parameterType="String" resultType="com.team3.camping.domain.CustomUser">
+    	SELECT * 
+    	FROM   TUserInfo
+    	WHERE  UserId = #{strUserName}
+    </select>
+    
+    <!-- 아이디 Role -->
+    <select id="loadUserRole" parameterType="String" resultType="com.team3.camping.domain.UserRoles">
+    	SELECT UserId, Role
+    	FROM   TUserRoles
+    	WHERE  UserId = #{strUserName}
+    </select>
+    
+    <!-- 아이디 상태코드 -->
+    <select id="loadStateCode" parameterType="String" resultType="int">
+    	SELECT  StateCode
+		FROM   (
+		        SELECT StateCode
+		        FROM   TUserHis
+		        WHERE  UserIdOrEmail = #{strUserName}
+		        ORDER  BY UpdDate DESC
+		        )
+		WHERE   ROWNUM= 1
+    </select>
+    
+    <!-- 소셜 유저 상태코드 -->
+    <select id="loadSocialUserStateCode" parameterType="String" resultType="int">
+	    SELECT StateCode
+	    FROM   User_Tbl
+	    WHERE  Email = #{strUserEmail}
+    </select>
+    
+</mapper>
